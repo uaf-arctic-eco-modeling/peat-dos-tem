@@ -757,7 +757,7 @@ void Soil_Bgc::CH4Flux(const int mind, const int id) {
 		else
 			D[il] = r[il];
         
-		if (il == 0)
+		if (il == 1)
 			C[il] = -1.0 - ub;
 		else
 			C[il] = -1.0;
@@ -779,7 +779,7 @@ void Soil_Bgc::CH4Flux(const int mind, const int id) {
 			kslowc = bd->m_soid.kdn_m[il]*0.5;
             
 			Plant = bd->rp * ed->m_sois.rootfrac[il] * ed->d_soid.ch4[il] * bd->tveg * ed->d_vegs.realLAI * 0.5;
-    		
+
             if (ed->d_soid.watertab > (ed->m_sois.z[il] + ed->m_sois.dz[il]*0.5)) //layer above water table
             {
                 if (wtbflag == 0)
