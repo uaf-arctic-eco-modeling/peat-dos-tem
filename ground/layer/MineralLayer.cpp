@@ -20,9 +20,12 @@ void MineralLayer::updateProperty5Lookup(){
 		hksat = soillu->Ksat[stkey];
 		psisat =  soillu->Psisat[stkey];
 		bsw = soillu->b[stkey];
-		bulkden =soillu->bulkden[stkey];
+	//	bulkden =soillu->bulkden[stkey];
         tcdry = soillu->tcdry[stkey];
-        prtlden =2700.;
+     //   prtlden =2700.;
+        prtlden =2220.0; //Y.Mi, data from Kristen, g/m3
+        bulkden =950000.0; //Y.Mi, data from Kristen, kg/m3
+        poro = 57.21;//Y.Mi, data from Kristen,%
         tcdry = getDryThermCond(bulkden);
 		//tcdry = getDryThermCond(tcsolid, bulkden, prtlden);
 		 

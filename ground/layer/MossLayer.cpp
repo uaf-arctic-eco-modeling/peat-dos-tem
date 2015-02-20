@@ -14,8 +14,10 @@ MossLayer::MossLayer(const double &pdz, const int & sphagnum){
 // be converted to deep organic type
     
     tcsolid = 0.25;
-	prtlden = 1.3e3 ; // kg/m3, from ATBalland22005a
-	 
+//	prtlden = 1.3e3 ; // kg/m3, from ATBalland22005a
+	prtlden = 1.51e3 ; //Y.Mi, data from Kristen
+    
+    
 	fldcap = 0.516; // reference ? unit vwater/vtot ? // not used
 	wltpnt = 0.321; // reference   // not used
 	color = 3;// ATBeringer52001a;
@@ -25,8 +27,10 @@ MossLayer::MossLayer(const double &pdz, const int & sphagnum){
    	albdrynir = 0.4;
   
   // 	bulkden = 25000; // g/m3
-    bulkden = 5100;
-   	cfrac = 43.7; // %
+  //  bulkden = 5100;
+    // 	cfrac = 43.7; // %
+    bulkden = 15000; //Y.Mi, data from Kristen, kg/m3
+    cfrac = 43.08; // Y.Mi, data from Kristen
    	
    	if(sphagnum ==1){
    	hksat = 0.15; //mm/s
@@ -59,7 +63,8 @@ MossLayer::MossLayer(const double &pdz, const int & sphagnum){
     
 // the porosity might be changed with depth
     //bulkden = 0.03 e3 ; // kg/m3, from ATYoshikawa32004a
-	poro = 0.98;
+	//poro = 0.98;
+    poro = 0.99; //Y.Mi, data from Kristen
 	//tcmin =0.01; //0.1;
 	
   //  tcmin =0.04;	

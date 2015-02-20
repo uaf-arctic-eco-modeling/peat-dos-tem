@@ -15,8 +15,8 @@ PeatLayer::PeatLayer(const double & pdz, const int & upper){
 // it is assumed that when fire occurs, the left moss will
 // be converted to deep organic type
     tcsolid = 0.25;
-	prtlden = 1.3e3 ; // kg/m3, from ATBalland22005a
-	
+//	prtlden = 1.3e3 ; // kg/m3, from ATBalland22005a
+    
 	//psisat = -120; // mm
 	
 	fldcap = 0.516; // reference ? unit vwater/vtot ? // not used
@@ -30,7 +30,8 @@ PeatLayer::PeatLayer(const double & pdz, const int & upper){
         //tcsolid = 0.25;
        // vhcsolid=2.5e6; //J/m3K
         
-		poro = 0.95;
+		poro = 0.97;
+        
 		isFibric =true;
 		color = 8;// ATBeringer52001a;
     	albsatvis = 0.075;
@@ -40,15 +41,18 @@ PeatLayer::PeatLayer(const double & pdz, const int & upper){
 
    		hksat = 0.28;  
    	 	bsw=2.7;
-   	    bulkden = 51000; // g/m3
-   		cfrac = 44.2; // %
+ //  	    bulkden = 51000; // g/m3
+//  		cfrac = 44.2; // %
+        prtlden = 1.51e3 ; //Y.Mi, data from Kristen, kg/m3
+        bulkden = 50000; // g/m3, Y.Mi, data from Kristen
+        cfrac = 42.84; // % Y.Mi, data from Kristen
    		psisat =-10.0;
     }else{
         
        // tcsolid = 0.25;
        // vhcsolid=2.5e6; //J/m3K
         
-    	poro = 0.8;
+    	poro = 0.9;
 		isHumic =true;	
 		color = 3;// ATBeringer52001a;
     	albsatvis = 0.075;
@@ -56,8 +60,12 @@ PeatLayer::PeatLayer(const double & pdz, const int & upper){
    		albdryvis = 0.15;
    		albdrynir = 0.3;
  
-       	bulkden = 176000; // g/m3
-   	  	cfrac = 35.2; // %
+//       	bulkden = 176000; // g/m3
+//   	  	cfrac = 35.2; // %
+        
+        prtlden = 1.6e3 ; //Y.Mi, data from Kristen, kg/m3
+        bulkden = 155000; // g/m3, Y.Mi, data from Kristen
+        cfrac = 33.94; // % Y.Mi, data from Kristen
    		
    		bsw=8;
    		hksat =0.002;
