@@ -189,6 +189,8 @@ double SoilLayer::getUnfThermCond(){
   	double vliq = getVolLiq();
   	double s = (vice + vliq)/poro;
   	s = min(s, 1.0);
+    
+    
   	double ke= log(s) +1; // for unfrozen case
   	ke = max(ke, 0.);
   	if(s < 1.e-7){

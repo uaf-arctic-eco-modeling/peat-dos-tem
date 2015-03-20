@@ -86,8 +86,18 @@ bool Peat::sameDeepThickRange(const double & thickness) {
 		newdeepnum = 8;
 	else if (thickness > 8 * dlstshlw && thickness <= 9 * dlstshlw)
 		newdeepnum = 9;
+    else if (thickness > 9 * dlstshlw && thickness <= 10 * dlstshlw) //Y.Mi
+        newdeepnum = 10;
+    else if (thickness > 10 * dlstshlw && thickness <= 11 * dlstshlw)
+        newdeepnum = 11;
+    else if (thickness > 11 * dlstshlw && thickness <= 12 * dlstshlw)
+        newdeepnum = 12;
+    else if (thickness > 12 * dlstshlw && thickness <= 13 * dlstshlw)
+        newdeepnum = 13;
+    else if (thickness > 13 * dlstshlw && thickness <= 14 * dlstshlw)
+        newdeepnum = 14;
 	else
-		newdeepnum = 10;
+		newdeepnum = 15;
 
 	/*
 	 if (thickness < 3 * dlstshlw) {
@@ -194,6 +204,11 @@ void Peat::initDeepThicknesses(const double & thickness) {
 			deepdza[7] = -1;
 			deepdza[8] = -1;
 			deepdza[9] = -1;
+            deepdza[10] = -1;
+            deepdza[11] = -1;
+            deepdza[12] = -1;
+            deepdza[13] = -1;
+            deepdza[14] = -1;
 
 			deepnum = 1;
 		} else if (deepthick > dlstshlw && deepthick <= 2 * dlstshlw) {
@@ -207,6 +222,11 @@ void Peat::initDeepThicknesses(const double & thickness) {
 			deepdza[7] = -1;
 			deepdza[8] = -1;
 			deepdza[9] = -1;
+            deepdza[10] = -1;
+            deepdza[11] = -1;
+            deepdza[12] = -1;
+            deepdza[13] = -1;
+            deepdza[14] = -1;
 
 			deepnum = 2;
 		} else if (deepthick > 2 * dlstshlw && deepthick <= 3 * dlstshlw) {
@@ -220,6 +240,11 @@ void Peat::initDeepThicknesses(const double & thickness) {
 			deepdza[7] = -1;
 			deepdza[8] = -1;
 			deepdza[9] = -1;
+            deepdza[10] = -1;
+            deepdza[11] = -1;
+            deepdza[12] = -1;
+            deepdza[13] = -1;
+            deepdza[14] = -1;
 
 			deepnum = 3;
 		} else if (deepthick > 3 * dlstshlw && deepthick <= 4 * dlstshlw) {
@@ -233,6 +258,11 @@ void Peat::initDeepThicknesses(const double & thickness) {
 			deepdza[7] = -1;
 			deepdza[8] = -1;
 			deepdza[9] = -1;
+            deepdza[10] = -1;
+            deepdza[11] = -1;
+            deepdza[12] = -1;
+            deepdza[13] = -1;
+            deepdza[14] = -1;
 
 			deepnum = 4;
 		} else if (deepthick > 4 * dlstshlw && deepthick <= 5 * dlstshlw) {
@@ -246,6 +276,11 @@ void Peat::initDeepThicknesses(const double & thickness) {
 			deepdza[7] = -1;
 			deepdza[8] = -1;
 			deepdza[9] = -1;
+            deepdza[10] = -1;
+            deepdza[11] = -1;
+            deepdza[12] = -1;
+            deepdza[13] = -1;
+            deepdza[14] = -1;
 
 			deepnum = 5;
 		} else if (deepthick > 5 * dlstshlw && deepthick <= 6 * dlstshlw) {
@@ -259,6 +294,11 @@ void Peat::initDeepThicknesses(const double & thickness) {
 			deepdza[7] = -1;
 			deepdza[8] = -1;
 			deepdza[9] = -1;
+            deepdza[10] = -1;
+            deepdza[11] = -1;
+            deepdza[12] = -1;
+            deepdza[13] = -1;
+            deepdza[14] = -1;
 
 			deepnum = 6;
 		} else if (deepthick > 6 * dlstshlw && deepthick <= 7 * dlstshlw) {
@@ -272,6 +312,11 @@ void Peat::initDeepThicknesses(const double & thickness) {
 			deepdza[7] = -1;
 			deepdza[8] = -1;
 			deepdza[9] = -1;
+            deepdza[10] = -1;
+            deepdza[11] = -1;
+            deepdza[12] = -1;
+            deepdza[13] = -1;
+            deepdza[14] = -1;
 
 			deepnum = 7;
 		} else if (deepthick > 7 * dlstshlw && deepthick <= 8 * dlstshlw) {
@@ -285,6 +330,11 @@ void Peat::initDeepThicknesses(const double & thickness) {
 			deepdza[7] = 8. / 36. * deepthick;
 			deepdza[8] = -1;
 			deepdza[9] = -1;
+            deepdza[10] = -1;
+            deepdza[11] = -1;
+            deepdza[12] = -1;
+            deepdza[13] = -1;
+            deepdza[14] = -1;
 
 			deepnum = 8;
 		} else if (deepthick > 8 * dlstshlw && deepthick <= 9 * dlstshlw) {
@@ -298,9 +348,14 @@ void Peat::initDeepThicknesses(const double & thickness) {
 			deepdza[7] = 8. / 45. * deepthick;
 			deepdza[8] = 9. / 45. * deepthick;
 			deepdza[9] = -1;
+            deepdza[10] = -1;
+            deepdza[11] = -1;
+            deepdza[12] = -1;
+            deepdza[13] = -1;
+            deepdza[14] = -1;
 
 			deepnum = 9;
-		} else {
+        }else if (deepthick > 9 * dlstshlw && deepthick <= 10 * dlstshlw){
 			deepdza[0] = 1. / 55. * deepthick;
 			deepdza[1] = 2. / 55. * deepthick;
 			deepdza[2] = 3. / 55. * deepthick;
@@ -311,22 +366,127 @@ void Peat::initDeepThicknesses(const double & thickness) {
 			deepdza[7] = 8. / 55. * deepthick;
 			deepdza[8] = 9. / 55. * deepthick;
 			deepdza[9] = 10. / 55. * deepthick;
+            deepdza[10] = -1;
+            deepdza[11] = -1;
+            deepdza[12] = -1;
+            deepdza[13] = -1;
+            deepdza[14] = -1;
 
 			deepnum = 10;
-		}
+        }else if (deepthick > 10 * dlstshlw && deepthick <= 11 * dlstshlw){
+            deepdza[0] = 1. / 66. * deepthick;
+            deepdza[1] = 2. / 66. * deepthick;
+            deepdza[2] = 3. / 66. * deepthick;
+            deepdza[3] = 4. / 66. * deepthick;
+            deepdza[4] = 5. / 66. * deepthick;
+            deepdza[5] = 6. / 66. * deepthick;
+            deepdza[6] = 7. / 66. * deepthick;
+            deepdza[7] = 8. / 66. * deepthick;
+            deepdza[8] = 9. / 66. * deepthick;
+            deepdza[9] = 10. / 66. * deepthick;
+            deepdza[10] = 11. / 66. * deepthick;
+            deepdza[11] = -1;
+            deepdza[12] = -1;
+            deepdza[13] = -1;
+            deepdza[14] = -1;
+            deepnum = 11;
+            
+        }else if (deepthick > 11 * dlstshlw && deepthick <= 12 * dlstshlw){
+            deepdza[0] = 1. / 78. * deepthick;
+            deepdza[1] = 2. / 78. * deepthick;
+            deepdza[2] = 3. / 78. * deepthick;
+            deepdza[3] = 4. / 78. * deepthick;
+            deepdza[4] = 5. / 78. * deepthick;
+            deepdza[5] = 6. / 78. * deepthick;
+            deepdza[6] = 7. / 78. * deepthick;
+            deepdza[7] = 8. / 78. * deepthick;
+            deepdza[8] = 9. / 78. * deepthick;
+            deepdza[9] = 10. / 78. * deepthick;
+            deepdza[10] = 11. / 78. * deepthick;
+            deepdza[11] = 12. / 78. * deepthick;
+            deepdza[12] = -1;
+            deepdza[13] = -1;
+            deepdza[14] = -1;
+            
+            deepnum = 12;
+            
+        }else if (deepthick > 12 * dlstshlw && deepthick <= 13 * dlstshlw){
+            deepdza[0] = 1. / 91. * deepthick;
+            deepdza[1] = 2. / 91. * deepthick;
+            deepdza[2] = 3. / 91. * deepthick;
+            deepdza[3] = 4. / 91. * deepthick;
+            deepdza[4] = 5. / 91. * deepthick;
+            deepdza[5] = 6. / 91. * deepthick;
+            deepdza[6] = 7. / 91. * deepthick;
+            deepdza[7] = 8. / 91. * deepthick;
+            deepdza[8] = 9. / 91. * deepthick;
+            deepdza[9] = 10. / 91. * deepthick;
+            deepdza[10] = 11. / 91. * deepthick;
+            deepdza[11] = 12. / 91. * deepthick;
+            deepdza[12] = 13. / 91. * deepthick;
+            deepdza[13] = -1;
+            deepdza[14] = -1;
+            
+            deepnum = 13;
+            
+        }else if (deepthick > 13 * dlstshlw && deepthick <= 14 * dlstshlw){
+            deepdza[0] = 1. / 105. * deepthick;
+            deepdza[1] = 2. / 105. * deepthick;
+            deepdza[2] = 3. / 105. * deepthick;
+            deepdza[3] = 4. / 105. * deepthick;
+            deepdza[4] = 5. / 105. * deepthick;
+            deepdza[5] = 6. / 105. * deepthick;
+            deepdza[6] = 7. / 105. * deepthick;
+            deepdza[7] = 8. / 105. * deepthick;
+            deepdza[8] = 9. / 105. * deepthick;
+            deepdza[9] = 10. / 105. * deepthick;
+            deepdza[10] = 11. / 105. * deepthick;
+            deepdza[11] = 12. / 105. * deepthick;
+            deepdza[12] = 13. / 105. * deepthick;
+            deepdza[13] = 14. / 105. * deepthick;
+            deepdza[14] = -1;
+            
+            deepnum = 14;
+            
+        }else if (deepthick > 14 * dlstshlw && deepthick <= 15 * dlstshlw){
+            deepdza[0] = 1. / 120. * deepthick;
+            deepdza[1] = 2. / 120. * deepthick;
+            deepdza[2] = 3. / 120. * deepthick;
+            deepdza[3] = 4. / 120. * deepthick;
+            deepdza[4] = 5. / 120. * deepthick;
+            deepdza[5] = 6. / 120. * deepthick;
+            deepdza[6] = 7. / 120. * deepthick;
+            deepdza[7] = 8. / 120. * deepthick;
+            deepdza[8] = 9. / 120. * deepthick;
+            deepdza[9] = 10. / 120. * deepthick;
+            deepdza[10] = 11. / 120. * deepthick;
+            deepdza[11] = 12. / 120. * deepthick;
+            deepdza[12] = 13. / 120. * deepthick;
+            deepdza[13] = 14. / 120. * deepthick;
+            deepdza[14] = 15. / 120. * deepthick;
+            
+            deepnum = 15;
+		
 	} else {
-		deepdza[0] = 1. / 55. * deepthick;
-		deepdza[1] = 2. / 55. * deepthick;
-		deepdza[2] = 3. / 55. * deepthick;
-		deepdza[3] = 4. / 55. * deepthick;
-		deepdza[4] = 5. / 55. * deepthick;
-		deepdza[5] = 6. / 55. * deepthick;
-		deepdza[6] = 7. / 55. * deepthick;
-		deepdza[7] = 8. / 55. * deepthick;
-		deepdza[8] = 9. / 55. * deepthick;
-		deepdza[9] = 10. / 55. * deepthick;
-
-		deepnum = 10;
+        deepdza[0] = 1. / 120. * deepthick;
+        deepdza[1] = 2. / 120. * deepthick;
+        deepdza[2] = 3. / 120. * deepthick;
+        deepdza[3] = 4. / 120. * deepthick;
+        deepdza[4] = 5. / 120. * deepthick;
+        deepdza[5] = 6. / 120. * deepthick;
+        deepdza[6] = 7. / 120. * deepthick;
+        deepdza[7] = 8. / 120. * deepthick;
+        deepdza[8] = 9. / 120. * deepthick;
+        deepdza[9] = 10. / 120. * deepthick;
+        deepdza[10] = 11. / 120. * deepthick;
+        deepdza[11] = 12. / 120. * deepthick;
+        deepdza[12] = 13. / 120. * deepthick;
+        deepdza[13] = 14. / 120. * deepthick;
+        deepdza[14] = 15. / 120. * deepthick;
+        
+        
+        deepnum = 15;
+    }
 		/*
 		deepdza[0] = deepthick;
 		deepdza[1] = -1;

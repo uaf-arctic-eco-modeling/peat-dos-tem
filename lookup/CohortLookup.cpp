@@ -144,10 +144,10 @@ void CohortLookup::assignVegetationParams(){
 	float dumc2nmin[] = {16.89, 229.13, 295.08, 216.67 };
     float dumcnmin[] = {0, 0, 0,  0};
 
-//	float dumc2na[] = {0, 0, 0,  0 };  // c2nmin = c2nb
+	float dumc2na[] = {0, 0, 0,  0 };  // c2nmin = c2nb
 //	float dumc2nb[] = {55.91, 229.13, 295.08, 216.67};  //Yuan: modified
-    float dumc2na[] = {46.72, 0, 0,  0 };
-    float dumc2nb[] = {24.44, 229.13, 295.08, 216.67};
+
+    float dumc2nb[] = {35.16, 229.13, 295.08, 216.67};
 	float dumabv2totmass[] = { 0.60, 0.70, 0.81,  0.8};     //yuan: modified
 
    	float duminitcneven[] = {123.06, 27.66, 164.3,  68.08}; //yuan: modified

@@ -5,7 +5,7 @@
 
 	const int MAX_MOS_LAY =3; //2 maximum number of moss Layer
 	const int MAX_SLW_LAY =5; // 3 maximum number of shallow organic Layer
-	const int MAX_DEP_LAY =10; // 3, maximum number of deep organic Layer
+	const int MAX_DEP_LAY =20; // 10, maximum number of deep organic Layer
 	const int MAX_MIN_LAY =12; // 13, maximum number of mineral Layer (0.1,0.1,0.1,0.1, 0.2,0.2,0.2,0.3,0.3,0.3, 0.5, 1, 2)
 	const float MINETHICK[MAX_MIN_LAY] = {0.1,0.1,0.1,0.1, 0.2,0.2,0.2,0.3,0.3,0.3, 0.5, 1.0};//, 2.0};
 
@@ -16,7 +16,7 @@
 	const int MAX_GRN_LAY =MAX_SOI_LAY+ MAX_SNW_LAY + MAX_ROC_LAY; //maximumum number of Ground (soil+rock+snow) Layer
 	
 	const int MAX_NUM_FNT =10; // maximum number of fronts in ground
-	const int MAX_OUT_SOI =15; //10; //maximum number of soil layer for output
+	const int MAX_OUT_SOI =40; //15; //maximum number of soil layer for output
 	const int MAX_OUT_SNW =6;  //maximum number of snow layer for output
     	 
 #endif /*LAYERCONST_H_*/

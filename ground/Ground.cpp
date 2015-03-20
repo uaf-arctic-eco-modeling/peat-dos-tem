@@ -157,6 +157,7 @@ void Ground::updateDaily(const int & yrcnt, const int & year, const int & mind,
 
 	// soil.updateRunoffInfil(fstsoill, rnth, melt);
 	ed->d_soid.watertab = soil.getWaterTable(fstsoill, curyear, dayofyear);
+
 	ed->d_soid.frasat = soil.getFracSat(ed->d_soid.frasat);
 
 	updateThermState();
@@ -205,7 +206,8 @@ void Ground::updateDaily(const int & yrcnt, const int & year, const int & mind,
 		evap /= sinday; // mm/day to mm/s
 
 		double watertab = soil.getWaterTable(frontl, 0, 0);
-		double drain = soil.getDrainage(watertab);
+		
+        double drain = soil.getDrainage(watertab);
 
 		if (ed->cd->drgtype == 1) //poorly drained site
 			drain = 0.0;
@@ -1871,6 +1873,469 @@ void Ground::updateDeepThickness() {
 					soil.peat.deepdza[1]);
 			insertAfter(plnew1, deepsl);
 		}
+        
+        else if (soil.peat.deepnum == 11) {
+            SoilLayer* deepsl = dynamic_cast<SoilLayer*> (fstdeepl);
+            
+            PeatLayer* plnew10 = new PeatLayer(soil.peat.deepdza[10], 0);
+            divideOneSoilLayerU2L(deepsl, plnew10, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3] + soil.peat.deepdza[4]
+                                  + soil.peat.deepdza[5] + soil.peat.deepdza[6]
+                                  + soil.peat.deepdza[7] + soil.peat.deepdza[8]+
+                                  soil.peat.deepdza[9],soil.peat.deepdza[10]);
+            insertAfter(plnew10, deepsl);
+            
+            PeatLayer* plnew9 = new PeatLayer(soil.peat.deepdza[9], 0);
+            divideOneSoilLayerU2L(deepsl, plnew9, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3] + soil.peat.deepdza[4]
+                                  + soil.peat.deepdza[5] + soil.peat.deepdza[6]
+                                  + soil.peat.deepdza[7] + soil.peat.deepdza[8],
+                                  soil.peat.deepdza[9]);
+            insertAfter(plnew9, deepsl);
+            
+            PeatLayer* plnew8 = new PeatLayer(soil.peat.deepdza[8], 0);
+            divideOneSoilLayerU2L(deepsl, plnew8, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3] + soil.peat.deepdza[4]
+                                  + soil.peat.deepdza[5] + soil.peat.deepdza[6]
+                                  + soil.peat.deepdza[7], soil.peat.deepdza[8]);
+            insertAfter(plnew8, deepsl);
+            
+            PeatLayer* plnew7 = new PeatLayer(soil.peat.deepdza[7], 0);
+            divideOneSoilLayerU2L(deepsl, plnew7, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3] + soil.peat.deepdza[4]
+                                  + soil.peat.deepdza[5] + soil.peat.deepdza[6],
+                                  soil.peat.deepdza[7]);
+            insertAfter(plnew7, deepsl);
+            
+            PeatLayer* plnew6 = new PeatLayer(soil.peat.deepdza[6], 0);
+            divideOneSoilLayerU2L(deepsl, plnew6, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3] + soil.peat.deepdza[4]
+                                  + soil.peat.deepdza[5], soil.peat.deepdza[6]);
+            insertAfter(plnew6, deepsl);
+            
+            PeatLayer* plnew5 = new PeatLayer(soil.peat.deepdza[5], 0);
+            divideOneSoilLayerU2L(deepsl, plnew5, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3] + soil.peat.deepdza[4],
+                                  soil.peat.deepdza[5]);
+            insertAfter(plnew5, deepsl);
+            
+            PeatLayer* plnew4 = new PeatLayer(soil.peat.deepdza[4], 0);
+            divideOneSoilLayerU2L(deepsl, plnew4, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3], soil.peat.deepdza[4]);
+            insertAfter(plnew4, deepsl);
+            
+            PeatLayer* plnew3 = new PeatLayer(soil.peat.deepdza[3], 0);
+            divideOneSoilLayerU2L(deepsl, plnew3, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2],
+                                  soil.peat.deepdza[3]);
+            insertAfter(plnew3, deepsl);
+            
+            PeatLayer* plnew2 = new PeatLayer(soil.peat.deepdza[2], 0);
+            divideOneSoilLayerU2L(deepsl, plnew2, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1], soil.peat.deepdza[2]);
+            insertAfter(plnew2, deepsl);
+            
+            PeatLayer* plnew1 = new PeatLayer(soil.peat.deepdza[1], 0);
+            divideOneSoilLayerU2L(deepsl, plnew1, soil.peat.deepdza[0],
+                                  soil.peat.deepdza[1]);
+            insertAfter(plnew1, deepsl);
+        }
+        
+        else if (soil.peat.deepnum == 12) {
+            SoilLayer* deepsl = dynamic_cast<SoilLayer*> (fstdeepl);
+            
+            PeatLayer* plnew11 = new PeatLayer(soil.peat.deepdza[11], 0);
+            divideOneSoilLayerU2L(deepsl, plnew11, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3] + soil.peat.deepdza[4]
+                                  + soil.peat.deepdza[5] + soil.peat.deepdza[6]
+                                  + soil.peat.deepdza[7] + soil.peat.deepdza[8]+
+                                  soil.peat.deepdza[9]+soil.peat.deepdza[10],soil.peat.deepdza[11]);
+            insertAfter(plnew11, deepsl);
+            
+            PeatLayer* plnew10 = new PeatLayer(soil.peat.deepdza[10], 0);
+            divideOneSoilLayerU2L(deepsl, plnew10, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3] + soil.peat.deepdza[4]
+                                  + soil.peat.deepdza[5] + soil.peat.deepdza[6]
+                                  + soil.peat.deepdza[7] + soil.peat.deepdza[8]+
+                                  soil.peat.deepdza[9],soil.peat.deepdza[10]);
+            insertAfter(plnew10, deepsl);
+            
+            PeatLayer* plnew9 = new PeatLayer(soil.peat.deepdza[9], 0);
+            divideOneSoilLayerU2L(deepsl, plnew9, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3] + soil.peat.deepdza[4]
+                                  + soil.peat.deepdza[5] + soil.peat.deepdza[6]
+                                  + soil.peat.deepdza[7] + soil.peat.deepdza[8],
+                                  soil.peat.deepdza[9]);
+            insertAfter(plnew9, deepsl);
+            
+            PeatLayer* plnew8 = new PeatLayer(soil.peat.deepdza[8], 0);
+            divideOneSoilLayerU2L(deepsl, plnew8, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3] + soil.peat.deepdza[4]
+                                  + soil.peat.deepdza[5] + soil.peat.deepdza[6]
+                                  + soil.peat.deepdza[7], soil.peat.deepdza[8]);
+            insertAfter(plnew8, deepsl);
+            
+            PeatLayer* plnew7 = new PeatLayer(soil.peat.deepdza[7], 0);
+            divideOneSoilLayerU2L(deepsl, plnew7, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3] + soil.peat.deepdza[4]
+                                  + soil.peat.deepdza[5] + soil.peat.deepdza[6],
+                                  soil.peat.deepdza[7]);
+            insertAfter(plnew7, deepsl);
+            
+            PeatLayer* plnew6 = new PeatLayer(soil.peat.deepdza[6], 0);
+            divideOneSoilLayerU2L(deepsl, plnew6, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3] + soil.peat.deepdza[4]
+                                  + soil.peat.deepdza[5], soil.peat.deepdza[6]);
+            insertAfter(plnew6, deepsl);
+            
+            PeatLayer* plnew5 = new PeatLayer(soil.peat.deepdza[5], 0);
+            divideOneSoilLayerU2L(deepsl, plnew5, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3] + soil.peat.deepdza[4],
+                                  soil.peat.deepdza[5]);
+            insertAfter(plnew5, deepsl);
+            
+            PeatLayer* plnew4 = new PeatLayer(soil.peat.deepdza[4], 0);
+            divideOneSoilLayerU2L(deepsl, plnew4, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3], soil.peat.deepdza[4]);
+            insertAfter(plnew4, deepsl);
+            
+            PeatLayer* plnew3 = new PeatLayer(soil.peat.deepdza[3], 0);
+            divideOneSoilLayerU2L(deepsl, plnew3, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2],
+                                  soil.peat.deepdza[3]);
+            insertAfter(plnew3, deepsl);
+            
+            PeatLayer* plnew2 = new PeatLayer(soil.peat.deepdza[2], 0);
+            divideOneSoilLayerU2L(deepsl, plnew2, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1], soil.peat.deepdza[2]);
+            insertAfter(plnew2, deepsl);
+            
+            PeatLayer* plnew1 = new PeatLayer(soil.peat.deepdza[1], 0);
+            divideOneSoilLayerU2L(deepsl, plnew1, soil.peat.deepdza[0],
+                                  soil.peat.deepdza[1]);
+            insertAfter(plnew1, deepsl);
+        }
+        
+        else if (soil.peat.deepnum == 13) {
+            SoilLayer* deepsl = dynamic_cast<SoilLayer*> (fstdeepl);
+            
+            PeatLayer* plnew12 = new PeatLayer(soil.peat.deepdza[12], 0);
+            divideOneSoilLayerU2L(deepsl, plnew12, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3] + soil.peat.deepdza[4]
+                                  + soil.peat.deepdza[5] + soil.peat.deepdza[6]
+                                  + soil.peat.deepdza[7] + soil.peat.deepdza[8]+
+                                  soil.peat.deepdza[9]+soil.peat.deepdza[10]+soil.peat.deepdza[11],soil.peat.deepdza[12]);
+            insertAfter(plnew12, deepsl);
+            
+            PeatLayer* plnew11 = new PeatLayer(soil.peat.deepdza[11], 0);
+            divideOneSoilLayerU2L(deepsl, plnew11, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3] + soil.peat.deepdza[4]
+                                  + soil.peat.deepdza[5] + soil.peat.deepdza[6]
+                                  + soil.peat.deepdza[7] + soil.peat.deepdza[8]+
+                                  soil.peat.deepdza[9]+soil.peat.deepdza[10],soil.peat.deepdza[11]);
+            insertAfter(plnew11, deepsl);
+            
+            PeatLayer* plnew10 = new PeatLayer(soil.peat.deepdza[10], 0);
+            divideOneSoilLayerU2L(deepsl, plnew10, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3] + soil.peat.deepdza[4]
+                                  + soil.peat.deepdza[5] + soil.peat.deepdza[6]
+                                  + soil.peat.deepdza[7] + soil.peat.deepdza[8]+
+                                  soil.peat.deepdza[9],soil.peat.deepdza[10]);
+            insertAfter(plnew10, deepsl);
+            
+            PeatLayer* plnew9 = new PeatLayer(soil.peat.deepdza[9], 0);
+            divideOneSoilLayerU2L(deepsl, plnew9, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3] + soil.peat.deepdza[4]
+                                  + soil.peat.deepdza[5] + soil.peat.deepdza[6]
+                                  + soil.peat.deepdza[7] + soil.peat.deepdza[8],
+                                  soil.peat.deepdza[9]);
+            insertAfter(plnew9, deepsl);
+            
+            PeatLayer* plnew8 = new PeatLayer(soil.peat.deepdza[8], 0);
+            divideOneSoilLayerU2L(deepsl, plnew8, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3] + soil.peat.deepdza[4]
+                                  + soil.peat.deepdza[5] + soil.peat.deepdza[6]
+                                  + soil.peat.deepdza[7], soil.peat.deepdza[8]);
+            insertAfter(plnew8, deepsl);
+            
+            PeatLayer* plnew7 = new PeatLayer(soil.peat.deepdza[7], 0);
+            divideOneSoilLayerU2L(deepsl, plnew7, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3] + soil.peat.deepdza[4]
+                                  + soil.peat.deepdza[5] + soil.peat.deepdza[6],
+                                  soil.peat.deepdza[7]);
+            insertAfter(plnew7, deepsl);
+            
+            PeatLayer* plnew6 = new PeatLayer(soil.peat.deepdza[6], 0);
+            divideOneSoilLayerU2L(deepsl, plnew6, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3] + soil.peat.deepdza[4]
+                                  + soil.peat.deepdza[5], soil.peat.deepdza[6]);
+            insertAfter(plnew6, deepsl);
+            
+            PeatLayer* plnew5 = new PeatLayer(soil.peat.deepdza[5], 0);
+            divideOneSoilLayerU2L(deepsl, plnew5, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3] + soil.peat.deepdza[4],
+                                  soil.peat.deepdza[5]);
+            insertAfter(plnew5, deepsl);
+            
+            PeatLayer* plnew4 = new PeatLayer(soil.peat.deepdza[4], 0);
+            divideOneSoilLayerU2L(deepsl, plnew4, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3], soil.peat.deepdza[4]);
+            insertAfter(plnew4, deepsl);
+            
+            PeatLayer* plnew3 = new PeatLayer(soil.peat.deepdza[3], 0);
+            divideOneSoilLayerU2L(deepsl, plnew3, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2],
+                                  soil.peat.deepdza[3]);
+            insertAfter(plnew3, deepsl);
+            
+            PeatLayer* plnew2 = new PeatLayer(soil.peat.deepdza[2], 0);
+            divideOneSoilLayerU2L(deepsl, plnew2, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1], soil.peat.deepdza[2]);
+            insertAfter(plnew2, deepsl);
+            
+            PeatLayer* plnew1 = new PeatLayer(soil.peat.deepdza[1], 0);
+            divideOneSoilLayerU2L(deepsl, plnew1, soil.peat.deepdza[0],
+                                  soil.peat.deepdza[1]);
+            insertAfter(plnew1, deepsl);
+        }
+        
+        else if (soil.peat.deepnum == 14) {
+            SoilLayer* deepsl = dynamic_cast<SoilLayer*> (fstdeepl);
+            
+            PeatLayer* plnew13 = new PeatLayer(soil.peat.deepdza[13], 0);
+            divideOneSoilLayerU2L(deepsl, plnew13, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3] + soil.peat.deepdza[4]
+                                  + soil.peat.deepdza[5] + soil.peat.deepdza[6]
+                                  + soil.peat.deepdza[7] + soil.peat.deepdza[8]+
+                                  soil.peat.deepdza[9]+soil.peat.deepdza[10]+soil.peat.deepdza[11]+soil.peat.deepdza[12],soil.peat.deepdza[13]);
+            insertAfter(plnew13, deepsl);
+            
+            PeatLayer* plnew12 = new PeatLayer(soil.peat.deepdza[12], 0);
+            divideOneSoilLayerU2L(deepsl, plnew12, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3] + soil.peat.deepdza[4]
+                                  + soil.peat.deepdza[5] + soil.peat.deepdza[6]
+                                  + soil.peat.deepdza[7] + soil.peat.deepdza[8]+
+                                  soil.peat.deepdza[9]+soil.peat.deepdza[10]+soil.peat.deepdza[11],soil.peat.deepdza[12]);
+            insertAfter(plnew12, deepsl);
+            
+            PeatLayer* plnew11 = new PeatLayer(soil.peat.deepdza[11], 0);
+            divideOneSoilLayerU2L(deepsl, plnew11, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3] + soil.peat.deepdza[4]
+                                  + soil.peat.deepdza[5] + soil.peat.deepdza[6]
+                                  + soil.peat.deepdza[7] + soil.peat.deepdza[8]+
+                                  soil.peat.deepdza[9]+soil.peat.deepdza[10],soil.peat.deepdza[11]);
+            insertAfter(plnew11, deepsl);
+            
+            PeatLayer* plnew10 = new PeatLayer(soil.peat.deepdza[10], 0);
+            divideOneSoilLayerU2L(deepsl, plnew10, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3] + soil.peat.deepdza[4]
+                                  + soil.peat.deepdza[5] + soil.peat.deepdza[6]
+                                  + soil.peat.deepdza[7] + soil.peat.deepdza[8]+
+                                  soil.peat.deepdza[9],soil.peat.deepdza[10]);
+            insertAfter(plnew10, deepsl);
+            
+            PeatLayer* plnew9 = new PeatLayer(soil.peat.deepdza[9], 0);
+            divideOneSoilLayerU2L(deepsl, plnew9, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3] + soil.peat.deepdza[4]
+                                  + soil.peat.deepdza[5] + soil.peat.deepdza[6]
+                                  + soil.peat.deepdza[7] + soil.peat.deepdza[8],
+                                  soil.peat.deepdza[9]);
+            insertAfter(plnew9, deepsl);
+            
+            PeatLayer* plnew8 = new PeatLayer(soil.peat.deepdza[8], 0);
+            divideOneSoilLayerU2L(deepsl, plnew8, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3] + soil.peat.deepdza[4]
+                                  + soil.peat.deepdza[5] + soil.peat.deepdza[6]
+                                  + soil.peat.deepdza[7], soil.peat.deepdza[8]);
+            insertAfter(plnew8, deepsl);
+            
+            PeatLayer* plnew7 = new PeatLayer(soil.peat.deepdza[7], 0);
+            divideOneSoilLayerU2L(deepsl, plnew7, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3] + soil.peat.deepdza[4]
+                                  + soil.peat.deepdza[5] + soil.peat.deepdza[6],
+                                  soil.peat.deepdza[7]);
+            insertAfter(plnew7, deepsl);
+            
+            PeatLayer* plnew6 = new PeatLayer(soil.peat.deepdza[6], 0);
+            divideOneSoilLayerU2L(deepsl, plnew6, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3] + soil.peat.deepdza[4]
+                                  + soil.peat.deepdza[5], soil.peat.deepdza[6]);
+            insertAfter(plnew6, deepsl);
+            
+            PeatLayer* plnew5 = new PeatLayer(soil.peat.deepdza[5], 0);
+            divideOneSoilLayerU2L(deepsl, plnew5, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3] + soil.peat.deepdza[4],
+                                  soil.peat.deepdza[5]);
+            insertAfter(plnew5, deepsl);
+            
+            PeatLayer* plnew4 = new PeatLayer(soil.peat.deepdza[4], 0);
+            divideOneSoilLayerU2L(deepsl, plnew4, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3], soil.peat.deepdza[4]);
+            insertAfter(plnew4, deepsl);
+            
+            PeatLayer* plnew3 = new PeatLayer(soil.peat.deepdza[3], 0);
+            divideOneSoilLayerU2L(deepsl, plnew3, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2],
+                                  soil.peat.deepdza[3]);
+            insertAfter(plnew3, deepsl);
+            
+            PeatLayer* plnew2 = new PeatLayer(soil.peat.deepdza[2], 0);
+            divideOneSoilLayerU2L(deepsl, plnew2, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1], soil.peat.deepdza[2]);
+            insertAfter(plnew2, deepsl);
+            
+            PeatLayer* plnew1 = new PeatLayer(soil.peat.deepdza[1], 0);
+            divideOneSoilLayerU2L(deepsl, plnew1, soil.peat.deepdza[0],
+                                  soil.peat.deepdza[1]);
+            insertAfter(plnew1, deepsl);
+        }
+
+        else if (soil.peat.deepnum == 15) {
+            SoilLayer* deepsl = dynamic_cast<SoilLayer*> (fstdeepl);
+            
+            PeatLayer* plnew14 = new PeatLayer(soil.peat.deepdza[14], 0);
+            divideOneSoilLayerU2L(deepsl, plnew14, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3] + soil.peat.deepdza[4]
+                                  + soil.peat.deepdza[5] + soil.peat.deepdza[6]
+                                  + soil.peat.deepdza[7] + soil.peat.deepdza[8]+
+                                  soil.peat.deepdza[9]+soil.peat.deepdza[10]+soil.peat.deepdza[11]+soil.peat.deepdza[12]+soil.peat.deepdza[13],soil.peat.deepdza[14]);
+            insertAfter(plnew14, deepsl);
+            
+            PeatLayer* plnew13 = new PeatLayer(soil.peat.deepdza[13], 0);
+            divideOneSoilLayerU2L(deepsl, plnew13, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3] + soil.peat.deepdza[4]
+                                  + soil.peat.deepdza[5] + soil.peat.deepdza[6]
+                                  + soil.peat.deepdza[7] + soil.peat.deepdza[8]+
+                                  soil.peat.deepdza[9]+soil.peat.deepdza[10]+soil.peat.deepdza[11]+soil.peat.deepdza[12],soil.peat.deepdza[13]);
+            insertAfter(plnew13, deepsl);
+            
+
+            
+            PeatLayer* plnew12 = new PeatLayer(soil.peat.deepdza[12], 0);
+            divideOneSoilLayerU2L(deepsl, plnew12, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3] + soil.peat.deepdza[4]
+                                  + soil.peat.deepdza[5] + soil.peat.deepdza[6]
+                                  + soil.peat.deepdza[7] + soil.peat.deepdza[8]+
+                                  soil.peat.deepdza[9]+soil.peat.deepdza[10]+soil.peat.deepdza[11],soil.peat.deepdza[12]);
+            insertAfter(plnew12, deepsl);
+            
+            PeatLayer* plnew11 = new PeatLayer(soil.peat.deepdza[11], 0);
+            divideOneSoilLayerU2L(deepsl, plnew11, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3] + soil.peat.deepdza[4]
+                                  + soil.peat.deepdza[5] + soil.peat.deepdza[6]
+                                  + soil.peat.deepdza[7] + soil.peat.deepdza[8]+
+                                  soil.peat.deepdza[9]+soil.peat.deepdza[10],soil.peat.deepdza[11]);
+            insertAfter(plnew11, deepsl);
+            
+            PeatLayer* plnew10 = new PeatLayer(soil.peat.deepdza[10], 0);
+            divideOneSoilLayerU2L(deepsl, plnew10, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3] + soil.peat.deepdza[4]
+                                  + soil.peat.deepdza[5] + soil.peat.deepdza[6]
+                                  + soil.peat.deepdza[7] + soil.peat.deepdza[8]+
+                                  soil.peat.deepdza[9],soil.peat.deepdza[10]);
+            insertAfter(plnew10, deepsl);
+            
+            PeatLayer* plnew9 = new PeatLayer(soil.peat.deepdza[9], 0);
+            divideOneSoilLayerU2L(deepsl, plnew9, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3] + soil.peat.deepdza[4]
+                                  + soil.peat.deepdza[5] + soil.peat.deepdza[6]
+                                  + soil.peat.deepdza[7] + soil.peat.deepdza[8],
+                                  soil.peat.deepdza[9]);
+            insertAfter(plnew9, deepsl);
+            
+            PeatLayer* plnew8 = new PeatLayer(soil.peat.deepdza[8], 0);
+            divideOneSoilLayerU2L(deepsl, plnew8, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3] + soil.peat.deepdza[4]
+                                  + soil.peat.deepdza[5] + soil.peat.deepdza[6]
+                                  + soil.peat.deepdza[7], soil.peat.deepdza[8]);
+            insertAfter(plnew8, deepsl);
+            
+            PeatLayer* plnew7 = new PeatLayer(soil.peat.deepdza[7], 0);
+            divideOneSoilLayerU2L(deepsl, plnew7, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3] + soil.peat.deepdza[4]
+                                  + soil.peat.deepdza[5] + soil.peat.deepdza[6],
+                                  soil.peat.deepdza[7]);
+            insertAfter(plnew7, deepsl);
+            
+            PeatLayer* plnew6 = new PeatLayer(soil.peat.deepdza[6], 0);
+            divideOneSoilLayerU2L(deepsl, plnew6, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3] + soil.peat.deepdza[4]
+                                  + soil.peat.deepdza[5], soil.peat.deepdza[6]);
+            insertAfter(plnew6, deepsl);
+            
+            PeatLayer* plnew5 = new PeatLayer(soil.peat.deepdza[5], 0);
+            divideOneSoilLayerU2L(deepsl, plnew5, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3] + soil.peat.deepdza[4],
+                                  soil.peat.deepdza[5]);
+            insertAfter(plnew5, deepsl);
+            
+            PeatLayer* plnew4 = new PeatLayer(soil.peat.deepdza[4], 0);
+            divideOneSoilLayerU2L(deepsl, plnew4, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2]
+                                  + soil.peat.deepdza[3], soil.peat.deepdza[4]);
+            insertAfter(plnew4, deepsl);
+            
+            PeatLayer* plnew3 = new PeatLayer(soil.peat.deepdza[3], 0);
+            divideOneSoilLayerU2L(deepsl, plnew3, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1] + soil.peat.deepdza[2],
+                                  soil.peat.deepdza[3]);
+            insertAfter(plnew3, deepsl);
+            
+            PeatLayer* plnew2 = new PeatLayer(soil.peat.deepdza[2], 0);
+            divideOneSoilLayerU2L(deepsl, plnew2, soil.peat.deepdza[0]
+                                  + soil.peat.deepdza[1], soil.peat.deepdza[2]);
+            insertAfter(plnew2, deepsl);
+            
+            PeatLayer* plnew1 = new PeatLayer(soil.peat.deepdza[1], 0);
+            divideOneSoilLayerU2L(deepsl, plnew1, soil.peat.deepdza[0],
+                                  soil.peat.deepdza[1]);
+            insertAfter(plnew1, deepsl);
+        }
+
 
 	} else {
 		soil.peat.olddeepthick = soil.peat.deepthick;
