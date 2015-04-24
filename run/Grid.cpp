@@ -21,7 +21,8 @@ int Grid::reinit(const int &grdid) {
 	double ampl;
 	for (int id = 0; id < 365; id++) {
 		ampl = exp(7.42 + 0.045 * gd->lat) / 3600.;
-		gd->alldaylengths[id] = ampl * (sin((id - 79) * 0.01721)) + 12.0;
+      //  gd->alldaylengths[id] = ampl * (sin((id - 79) * 0.01721)) + 12.0;
+		gd->alldaylengths[id] = ampl * (sin((id) * 0.01721)) + 12.0;
 	}
 
 	if(gd->fri< 0 || gd->fri> 4000){  //check for the validity of grid level data

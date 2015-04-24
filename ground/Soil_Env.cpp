@@ -15,8 +15,7 @@ void Soil_Env::updateDailySurfFlux(Layer* frontl, const double & tsurf,
 	double albvis = frontl->getAlbedoVis();
 	double albnir = frontl->getAlbedoNir();
 
-	double insw = ed->d_v2g.sw * ed->y_vegd.vegfrac + (1 - ed->y_vegd.vegfrac)
-			* ed->d_a2l.nirr;
+	double insw = ed->d_v2g.sw * ed->y_vegd.vegfrac + (1 - ed->y_vegd.vegfrac) * ed->d_a2l.nirr;
 
 	ed->d_soi2a.solrad = insw * 0.5 * albvis + insw * 0.5 * albnir;
 
@@ -56,11 +55,16 @@ void Soil_Env::updateDailySurfFlux(Layer* frontl, const double & tsurf,
 	double evap = 0.;
 	if (availliq > 0 && frontl->frozen == -1) {
 		evap = getEvaporation(tsurf, dayl, rad);
-		ed->d_soi2a.evap = min(availliq, evap);
+        
+       // cout<<availliq<<"\t"<<evap<<endl;
+        ed->d_soi2a.evap = min(availliq*0.01, evap);
+
+        
 	} else {
 		ed->d_soi2a.evap = 0;
 	}
 
+  
 }
 
 double Soil_Env::getPenMonET(const double & ta, const double& vpd,
@@ -90,8 +94,7 @@ double Soil_Env::getPenMonET(const double & ta, const double& vpd,
 	/*slope of pvs vs. T curve at T*/
 	double slope = (pvs1 - pvs2) / (t1 - t2);
 	/*evapotranspiration*/
-	et = (slope * irad + rho * CP * vpd / rhr) / ((pa * CP * rv) / (lhvap * EPS
-			* rhr) + slope);
+	et = (slope * irad + rho * CP * vpd / rhr) / ((pa * CP * rv) / (lhvap * EPS * rhr) + slope);
 	return et / lhvap;
 }
 
@@ -105,6 +108,8 @@ double Soil_Env::getEvaporation(const double & tsurf, const double & dayl,
 	//double rhoa = ed->d_atmd.rhoa;
 	double vpdpa = ed->d_atmd.vpd;
 	//double dsr = ed->d_atms.dsr;
+    
+    
 	double daylsec = dayl * 3600;
 	double daytimerad = rad * 86400 / daylsec; //w/m2
 	/* correct conductances for temperature and pressure based on Jones (1992)
@@ -116,26 +121,34 @@ double Soil_Env::getEvaporation(const double & tsurf, const double & dayl,
 	double pmet = getPenMonET(tair, vpdpa, daytimerad, rbl, rbl);
 	double dsr = ed->d_atms.dsr;
 	double ratiomin = envpar.evapmin;// 0.15;
+    double ratio = 0.0;
 
 	evap = pmet * daylsec;
+ 
+ //   cout<<ed->d_v2g.rdrip + ed->d_v2g.rthfl + ed->d_snwd.melt<<"\t"<<evap<<"\t"<<ratiomin<<endl;
 
-	if (ed->d_v2g.rdrip + ed->d_v2g.rthfl + ed->d_snwd.melt >= evap) {
-		evap *= 0.6;
-	} else {
-		/* calculate the realized proportion of potential evaporation
-		 as a function of the days since rain */
-		//double ratio =0.3/pow(dsr, 2.0);
-		double ratio = 0.3 / pow(dsr, 2.0);
-		//if(ratio<0.2) ratio =0.2;//good for dftc and dftb
-		//first determine the minimum ratio for dftb, since it is burned site
-		//the effect of transpiration is smaller than soil surface evaporation
+//	if (ed->d_v2g.rdrip + ed->d_v2g.rthfl + ed->d_snwd.melt >= evap) {
+//		ratio = 0.3;
+//       
+//	} else {
+//		/* calculate the realized proportion of potential evaporation
+//		 as a function of the days since rain */
+//		//double ratio =0.3/pow(dsr, 2.0);
+//		ratio = 0.3 / pow(dsr, 2.0);
+//		//if(ratio<0.2) ratio =0.2;//good for dftc and dftb
+//		//first determine the minimum ratio for dftb, since it is burned site
+//		//the effect of transpiration is smaller than soil surface evaporation
+//
+//		if (ratio < ratiomin)
+//			ratio = ratiomin;
+//
+//		
+//	}
 
-		if (ratio < ratiomin)
-			ratio = ratiomin;
-
-		evap *= ratio;
-	}
-
+    evap *= 0.08;
+    
+//    cout<<ratio<<"\t"<<evap<<endl;
+    evap=evap*0.05;
 	return evap;
 }
 
@@ -666,81 +679,81 @@ double Soil_Env::getWaterTable(Layer* fstsoill, const int year, const int doy) {
 
 //observed water table level
     
-/*  if (year == 2011) {
-		if (doy >= 154 && doy <= 264) {
-			int index = doy - 154;
-			wtd = wtb2011[index] / 100.0;
-
-			currl = fstsoill;
-			while (currl != NULL) {
-				if (currl->isRock())
-				break;
-
-				if ((currl->z + currl->dz / 2.0) < wtd)
-				wtd = wtd;
-				else {
-					if (currl->tem <= 0.0) {
-						currl->liq = 0.05 * currl->dz * 1000.0;
-						currl->ice = (currl->poro - 0.05) * currl->dz * 917.0;
-					} else {
-						currl->liq = (currl->poro - 0.05) * currl->dz * 917.0;
-						currl->ice = 0.05 * currl->dz * 1000.0;
-					}
-				}
-				currl = currl->nextl;
-			}
-		}
-	}
-    
-    else if (year == 2012) {
-		if (doy >= 164 && doy <= 272) {
-			int index = doy - 164;
-			wtd = wtb2012[index] / 100.0;
-            
-			currl = fstsoill;
-			while (currl != NULL) {
-				if (currl->isRock())
-                    break;
-                
-				if ((currl->z + currl->dz / 2.0) < wtd)
-                    wtd = wtd;
-				else {
-					if (currl->tem <= 0.0) {
-						currl->liq = 0.05 * currl->dz * 1000.0;
-						currl->ice = (currl->poro - 0.05) * currl->dz * 917.0;
-					} else {
-						currl->liq = (currl->poro - 0.05) * currl->dz * 917.0;
-						currl->ice = 0.05 * currl->dz * 1000.0;
-					}
-				}
-				currl = currl->nextl;
-			}
-		}
-	} else if (year == 2013) {
-		if (doy >= 163 && doy <= 247) {
-			int index = doy - 163;
-			wtd = wtb2013[index] / 100.0;
-            
-			currl = fstsoill;
-			while (currl != NULL) {
-				if (currl->isRock())
-                    break;
-                
-				if ((currl->z + currl->dz / 2.0) < wtd)
-                    wtd = wtd;
-				else {
-					if (currl->tem <= 0.0) {
-						currl->liq = 0.05 * currl->dz * 1000.0;
-						currl->ice = (currl->poro - 0.05) * currl->dz * 917.0;
-					} else {
-						currl->liq = (currl->poro - 0.05) * currl->dz * 917.0;
-						currl->ice = 0.05 * currl->dz * 1000.0;
-					}
-				}
-				currl = currl->nextl;
-			}
-		}
-	}
+// if (year == 2011) {
+//		if (doy >= 153 && doy <= 263) {
+//			int index = doy - 153;
+//			wtd = wtb2011[index] / 100.0;
+//
+//			currl = fstsoill;
+//			while (currl != NULL) {
+//				if (currl->isRock())
+//				break;
+//
+//				if ((currl->z + currl->dz / 2.0) < wtd)
+//				wtd = wtd;
+//				else {
+//					if (currl->tem <= 0.0) {
+//						currl->liq = 0.05 * currl->dz * 1000.0;
+//						currl->ice = (currl->poro - 0.05) * currl->dz * 917.0;
+//					} else {
+//						currl->liq = (currl->poro - 0.05) * currl->dz * 917.0;
+//						currl->ice = 0.05 * currl->dz * 1000.0;
+//					}
+//				}
+//				currl = currl->nextl;
+//			}
+//		}
+//	}
+//    
+//    else if (year == 2012) {
+//		if (doy >= 163 && doy <= 271) {
+//			int index = doy - 163;
+//			wtd = wtb2012[index] / 100.0;
+//            
+//			currl = fstsoill;
+//			while (currl != NULL) {
+//				if (currl->isRock())
+//                    break;
+//                
+//				if ((currl->z + currl->dz / 2.0) < wtd)
+//                    wtd = wtd;
+//				else {
+//					if (currl->tem <= 0.0) {
+//						currl->liq = 0.05 * currl->dz * 1000.0;
+//						currl->ice = (currl->poro - 0.05) * currl->dz * 917.0;
+//					} else {
+//						currl->liq = (currl->poro - 0.05) * currl->dz * 917.0;
+//						currl->ice = 0.05 * currl->dz * 1000.0;
+//					}
+//				}
+//				currl = currl->nextl;
+//			}
+//		}
+//	} else if (year == 2013) {
+//		if (doy >= 162 && doy <= 246) {
+//			int index = doy - 162;
+//			wtd = wtb2013[index] / 100.0;
+//            
+//			currl = fstsoill;
+//			while (currl != NULL) {
+//				if (currl->isRock())
+//                    break;
+//                
+//				if ((currl->z + currl->dz / 2.0) < wtd)
+//                    wtd = wtd;
+//				else {
+//					if (currl->tem <= 0.0) {
+//						currl->liq = 0.05 * currl->dz * 1000.0;
+//						currl->ice = (currl->poro - 0.05) * currl->dz * 917.0;
+//					} else {
+//						currl->liq = (currl->poro - 0.05) * currl->dz * 917.0;
+//						currl->ice = 0.05 * currl->dz * 1000.0;
+//					}
+//				}
+//				currl = currl->nextl;
+//			}
+//		}
+//	}
 
     
 //    else if (year == 2009) {
@@ -889,10 +902,10 @@ double Soil_Env::getWaterTable(Layer* fstsoill, const int year, const int doy) {
 //			}
 //		}
 //	}
-        else {
-            
-*/
-		
+//        else {
+//            
+//
+//		
 //	}
 
 //#endif
@@ -1453,6 +1466,7 @@ double Soil_Env::getSoilTransFactor(Layer* fstsoill) {
 		btran = 1;
 
 	}
+    
 	return btran;
 }
 

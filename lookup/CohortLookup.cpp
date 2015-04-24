@@ -484,7 +484,7 @@ void CohortLookup::assignSoilTextureParams(){
 // 	float dum_fibthick[MAX_DRG_TYPE][MAX_VEG_TYPE] =  {{0.03, 0.050, 0.050,  0.050},{0.03, 0.05, 0.09,  0.20 }};
 // 	float dum_humthick[MAX_DRG_TYPE][MAX_VEG_TYPE] =  {{0.93, 0.05, 0.050,  0.095},{0.93, 0.10, 0.10,  0.16 }};
     
-    float dum_mossthick[MAX_DRG_TYPE][MAX_VEG_TYPE] =  {{0.0, 0.0, 0.035,  0.035 },{0.15, 0.0, 0.025,  0.035 }};
+    float dum_mossthick[MAX_DRG_TYPE][MAX_VEG_TYPE] =  {{0.0, 0.0, 0.035,  0.035 },{0.13, 0.0, 0.025,  0.035 }};
  	float dum_fibthick[MAX_DRG_TYPE][MAX_VEG_TYPE] =  {{0.03, 0.05, 0.50,  0.50},{0.50, 0.05, 0.09,  0.20 }};
  	float dum_humthick[MAX_DRG_TYPE][MAX_VEG_TYPE] =  {{0.93, 0.05, 0.50,  0.095},{1.0, 0.10, 0.10,  0.16 }};
     

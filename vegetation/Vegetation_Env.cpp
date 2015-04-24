@@ -281,7 +281,9 @@ void Vegetation_Env::updateDaily(   const double & dayl){
  
     ed->d_v2g.rthfl *= ed->y_vegd.vegfrac;
     ed->d_v2g.sthfl *= ed->y_vegd.vegfrac ;
- 	         
+    
+    ed->d_v2a.trans *= 0.015;
+    ed->d_v2a.evapo *= 0.0075;
 	
 }
 

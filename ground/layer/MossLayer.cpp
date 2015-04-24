@@ -59,7 +59,7 @@ MossLayer::MossLayer(const double &pdz, const int & sphagnum){
    	albdrynir = 0.36; */
    	
    	
-   	vhcsolid=2.5e6; //J/m3K
+   	vhcsolid=2.3e6; //J/m3K
     
 // the porosity might be changed with depth
     //bulkden = 0.03 e3 ; // kg/m3, from ATYoshikawa32004a

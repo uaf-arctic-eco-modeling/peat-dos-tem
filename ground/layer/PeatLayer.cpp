@@ -21,7 +21,7 @@ PeatLayer::PeatLayer(const double & pdz, const int & upper){
 	
 	fldcap = 0.516; // reference ? unit vwater/vtot ? // not used
 	wltpnt = 0.321; // reference   // not used
-   	vhcsolid=2.5e6; //J/m3K
+   	vhcsolid=2.3e6; //J/m3K
 
 // the porosity might be changed with depth
 // the porosity can also be changed with the occurrence of fire   
@@ -39,7 +39,7 @@ PeatLayer::PeatLayer(const double & pdz, const int & upper){
    		albdryvis = 0.15;
    		albdrynir = 0.3; 
 
-   		hksat = 0.28;  
+        hksat = 0.28;
    	 	bsw=2.7;
  //  	    bulkden = 51000; // g/m3
 //  		cfrac = 44.2; // %

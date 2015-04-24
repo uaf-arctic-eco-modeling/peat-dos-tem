@@ -37,9 +37,7 @@ void Richard::updateSoilStructure(Layer* fstsoill) {
 }
 ;
 
-void Richard::update(Layer * frontl, Layer *backl, Layer *fstsoill,
-		Layer* drainl, double & drain, const double & trans,
-		const double & evap, const double & infil, const double & zwt) {
+void Richard::update(Layer * frontl, Layer *backl, Layer *fstsoill,Layer* drainl, double & drain, const double & trans,const double & evap, const double & infil, const double & zwt) {
 	// prepare arrays for variables which will not change during one day
 	// root fraction, temperature, ice
 	// it is assumed that all layers in Richard will be unfrozen
@@ -230,8 +228,7 @@ int Richard::updateOneTimeStep(Layer *fstsoill, const double & trans,
 }
 ;
 
-int Richard::updateOneIteration(Layer *fstsoill, const double & trans,
-		const double & evap, const double & infil, const double & drain) {
+int Richard::updateOneIteration(Layer *fstsoill, const double & trans,const double & evap, const double & infil, const double & drain) {
 	Layer *curr = fstsoill;
 
 	double poro1, effporo1, volliq1, s1;
@@ -283,8 +280,7 @@ int Richard::updateOneIteration(Layer *fstsoill, const double & trans,
 				dhkdw[ind] = 0.;
 			} else {
 				s1 = (volliq2 + volliq1) / (poro2 + poro1);
-				s2 = nexts->hksat * exp(-2 * (nexts->z + nexts->dz / 2)) * pow(
-						(double) s1, (double) 2 * nexts->bsw + 2);//nexts->getHydraulicCond();
+				s2 = nexts->hksat * exp(-2 * (nexts->z + nexts->dz / 2)) * pow((double) s1, (double) 2 * nexts->bsw + 2);//nexts->getHydraulicCond();
 
 				hk[ind] = s1 * s2;
 				dhkdw[ind] = (2. * bsw + 3) * s2 * 0.5 / poro2;

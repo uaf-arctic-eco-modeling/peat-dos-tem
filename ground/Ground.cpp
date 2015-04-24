@@ -48,9 +48,7 @@ Ground::~Ground() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void Ground::updateDaily(const int & yrcnt, const int & year, const int & mind,
-		const int & id, const double & tdrv2, const double & dayl,
-		const int & dayofyear) {
+void Ground::updateDaily(const int & yrcnt, const int & year, const int & mind,const int & id, const double & tdrv2, const double & dayl,const int & dayofyear) {
 	double tsurface;
 	double trans, melt, evap, rnth;
 	curyrcnt = yrcnt;
@@ -127,10 +125,8 @@ void Ground::updateDaily(const int & yrcnt, const int & year, const int & mind,
 
 	if (fstfntl == NULL && lstfntl == NULL) { // there is no front
 		if (frontl->isSoil()) {
-			if ((tstate == 1 && tdrv1 > 0) || (tstate == -1 && tdrv1 < 0)
-					|| tstate == 0) {//create front
-				soil.stefan.updateFronts(tdrv1, frontl, backl, fstsoill,
-						lstminl, mind);
+			if ((tstate == 1 && tdrv1 > 0) || (tstate == -1 && tdrv1 < 0)|| tstate == 0) {//create front
+				soil.stefan.updateFronts(tdrv1, frontl, backl, fstsoill,lstminl, mind);
 				// stefan.checkFrontsValidity(fstsoill);
 			}
 		}
@@ -140,24 +136,32 @@ void Ground::updateDaily(const int & yrcnt, const int & year, const int & mind,
 	}
 
 	updateFstLstFntLay();
-	soil.stefan.updateTemps(tdrv1, frontl, backl, fstsoill, fstfntl, lstfntl,
-			curyear, dayofyear);
+	soil.stefan.updateTemps(tdrv1, frontl, backl, fstsoill, fstfntl, lstfntl, curyear, dayofyear);
 
 	ed->d_soid.itnum = soil.stefan.itsumall;
 
 	// at end of the day, calculate the surface runoff and infiltration
 	// and then soil water dynamics at a daily time step
-	trans = ed->d_v2a.trans; //mm/day
+    
+    trans = ed->d_v2a.trans; //mm/day
 	evap = ed->d_soi2a.evap; //mm/day
-	rnth = (ed->d_v2g.rthfl + ed->d_v2g.rdrip) + (1 - ed->y_vegd.vegfrac)
-			* ed->d_a2l.rnfl; //mm/day
-	//the first two items has already been adjust by ed->y_vegd.vegfrac in VE
+    
+//   trans = 0.0; //mm/day
+//  evap = 0.0;
+  
+    
+//	rnth = (ed->d_v2g.rthfl + ed->d_v2g.rdrip) + (1 - ed->y_vegd.vegfrac)* ed->d_a2l.rnfl; //mm/day
+  rnth = ed->d_a2l.rnfl;
+    //the first two items has already been adjust by ed->y_vegd.vegfrac in VE
 
 	melt = ed->d_snwd.melt; //mm/day
 
 	// soil.updateRunoffInfil(fstsoill, rnth, melt);
 	ed->d_soid.watertab = soil.getWaterTable(fstsoill, curyear, dayofyear);
 
+//    if(ed->d_soid.watertab>=0.05)
+//        ed->d_soid.watertab=0.05;
+    
 	ed->d_soid.frasat = soil.getFracSat(ed->d_soid.frasat);
 
 	updateThermState();
@@ -169,7 +173,7 @@ void Ground::updateDaily(const int & yrcnt, const int & year, const int & mind,
 			//double runoff = soil.getRunoffVIC(fstsoill, rnth, melt); //mm/day
            double runoff = soil.getRunoff(fstsoill, rnth, melt,ed->d_soid.frasat); //mm/day
 
-        //    runoff = 0.0;
+           // double runoff = 0.0;
             
 			double infilf = rnth + melt - runoff; //mm/day
 			double leftinfil = soil.infilFrozen(fstminl, infilf);//mm/day
@@ -187,8 +191,7 @@ void Ground::updateDaily(const int & yrcnt, const int & year, const int & mind,
 
 	} else {
 		if (rnth + melt > 0) {
-			ed->d_soi2l.qover = soil.getRunoff(fstsoill, rnth, melt,
-					ed->d_soid.frasat); //mm/day
+            //ed->d_soi2l.qover = soil.getRunoff(fstsoill, rnth, melt,ed->d_soid.frasat); //mm/day
 			//ed->d_l2soi.perc = (rnth + melt) - ed->d_soi2l.qover;//mm/day
 			ed->d_l2soi.perc = rnth + melt;
 		} else {
@@ -198,39 +201,37 @@ void Ground::updateDaily(const int & yrcnt, const int & year, const int & mind,
 
 		double infil = ed->d_l2soi.perc;
 		double sinday = 24. * 3600.;
-
- //       trans = 0.3*sin (dayofyear*PI/365);
-        
+ 
+    
 		trans /= sinday; // mm/day to mm/s
 		infil /= sinday; // mm/day to mm/s
 		evap /= sinday; // mm/day to mm/s
-
-		double watertab = soil.getWaterTable(frontl, 0, 0);
+        
 		
-        double drain = soil.getDrainage(watertab);
-
-		if (ed->cd->drgtype == 1) //poorly drained site
-			drain = 0.0;
-		else
-			drain /= sinday;
-
-        evap = 0.0;
-      
- //     trans = 0.0;
-      trans = trans*0.1;
+ //       double drain = soil.getDrainage(ed->d_soid.watertab);
+        double drain=0.0;
+//
+//		if (ed->cd->drgtype == 1) //poorly drained site
+//			drain = 0.0;
+//		else
+//			drain /= sinday;
+//
+//    evap = 0.0;
+     
+//  trans = 0.0;
+  //    trans = trans*0.0;
         
   //      cout<<trans<<endl;
 
-		soil.richard.update(frontl, backl, fstsoill, drainl, drain, trans,
-				evap, infil, ed->d_soid.watertab);
+		soil.richard.update(frontl, backl, fstsoill, drainl, drain, trans, evap, infil, ed->d_soid.watertab);
 
+        
 		// double permftab = soil.getPermafrostTable(fstsoill);
 
 		//  ed->d_soi2l.qdrain =soil.update5BaseFlow(drainl);
 
 		if (ed->cd->drgtype == 0) {
-			ed->d_soi2l.qdrain = soil.update5Drainage(drainl,
-					ed->d_soid.frasat, ed->d_soid.watertab);
+			ed->d_soi2l.qdrain = soil.update5Drainage(drainl,ed->d_soid.frasat, ed->d_soid.watertab);
 		} else {
 			ed->d_soi2l.qdrain = 0;
 		}
@@ -248,15 +249,11 @@ void Ground::updateDaily(const int & yrcnt, const int & year, const int & mind,
 				if (sl->fronts[0]->frzing == -1) {//thawing front
 					//put some water of upper layer into this layer
 					if (fstfntl->prevl != NULL) {
-						if (fstfntl->prevl->isSoil() && fstfntl->prevl->frozen
-								== -1) {
-							SoilLayer* slp =
-									dynamic_cast<SoilLayer*> (fstfntl->prevl);
+						if (fstfntl->prevl->isSoil() && fstfntl->prevl->frozen== -1) {
+							SoilLayer* slp = dynamic_cast<SoilLayer*> (fstfntl->prevl);
 							if (slp->getVolLiq() > sl->getVolWater()) {
-								double provide = (slp->getVolLiq()
-										- sl->getVolWater()) * slp->dz * 1000.;
-								double receive = (sl->poro - sl->getVolWater())
-										* sl->dz * 1000.;
+								double provide = (slp->getVolLiq()- sl->getVolWater()) * slp->dz * 1000.;
+								double receive = (sl->poro - sl->getVolWater())* sl->dz * 1000.;
 								double delta = 0;
 								if (provide > receive) {
 									delta = receive;
@@ -278,15 +275,11 @@ void Ground::updateDaily(const int & yrcnt, const int & year, const int & mind,
 					SoilLayer* sl = dynamic_cast<SoilLayer*> (fstfntl);
 					if (sl->fronts[0]->frzing == -1) {//thawing front
 						//put some water of upper layer into this layer
-						if (fstfntl->prevl->isSoil() && fstfntl->prevl->frozen
-								== -1) {
-							SoilLayer* slp =
-									dynamic_cast<SoilLayer*> (fstfntl->prevl);
+						if (fstfntl->prevl->isSoil() && fstfntl->prevl->frozen == -1) {
+							SoilLayer* slp = dynamic_cast<SoilLayer*> (fstfntl->prevl);
 							if (slp->getVolLiq() > sl->getVolWater()) {
-								double provide = (slp->getVolLiq()
-										- sl->getVolWater()) * slp->dz * 1000.;
-								double receive = (sl->poro - sl->getVolWater())
-										* sl->dz * 1000.;
+								double provide = (slp->getVolLiq() - sl->getVolWater()) * slp->dz * 1000.;
+								double receive = (sl->poro - sl->getVolWater())* sl->dz * 1000.;
 								double delta = 0;
 								if (provide > receive) {
 									delta = receive;
@@ -307,15 +300,11 @@ void Ground::updateDaily(const int & yrcnt, const int & year, const int & mind,
 				if (lstfntl->prevl != NULL) {
 					if (sl->fronts[0]->frzing == -1) {//thawing front
 						//put some water of upper layer into this layer
-						if (lstfntl->prevl->isSoil() && lstfntl->prevl->frozen
-								== -1) {
-							SoilLayer* slp =
-									dynamic_cast<SoilLayer*> (lstfntl->prevl);
+						if (lstfntl->prevl->isSoil() && lstfntl->prevl->frozen == -1) {
+							SoilLayer* slp = dynamic_cast<SoilLayer*> (lstfntl->prevl);
 							if (slp->getVolLiq() > sl->getVolWater()) {
-								double provide = (slp->getVolLiq()
-										- sl->getVolWater()) * slp->dz * 1000.;
-								double receive = (sl->poro - sl->getVolWater())
-										* sl->dz * 1000.;
+								double provide = (slp->getVolLiq() - sl->getVolWater()) * slp->dz * 1000.;
+								double receive = (sl->poro - sl->getVolWater())* sl->dz * 1000.;
 								double delta = 0;
 								if (provide > receive) {
 									delta = receive;
@@ -1471,17 +1460,780 @@ void Ground::updateShlwThickness() {
 		} else if (soil.peat.shlwnum == 3) {//split shlw layer into 3 layers
 			PeatLayer* plnew2 = new PeatLayer(soil.peat.shlwdza[2], 1);
 			SoilLayer* shlwsl = dynamic_cast<SoilLayer*> (fstshlwl);
-			divideOneSoilLayerU2L(shlwsl, plnew2, soil.peat.shlwdza[0]
-					+ soil.peat.shlwdza[1], soil.peat.shlwdza[2]);
-			insertAfter(plnew2, shlwsl);
+			
+            divideOneSoilLayerU2L(shlwsl, plnew2, soil.peat.shlwdza[0] + soil.peat.shlwdza[1], soil.peat.shlwdza[2]);
+			
+            insertAfter(plnew2, shlwsl);
 
 			PeatLayer* plnew1 = new PeatLayer(soil.peat.shlwdza[1], 1);
-			divideOneSoilLayerU2L(shlwsl, plnew1, soil.peat.shlwdza[0],
-					soil.peat.shlwdza[1]);
+			divideOneSoilLayerU2L(shlwsl, plnew1, soil.peat.shlwdza[0], soil.peat.shlwdza[1]);
 			insertAfter(plnew1, shlwsl);
-		}
+            
+        } else if (soil.peat.shlwnum == 4) {//split shlw layer into 3 layers
+            PeatLayer* plnew3 = new PeatLayer(soil.peat.shlwdza[3], 1);
+            SoilLayer* shlwsl = dynamic_cast<SoilLayer*> (fstshlwl);
+            
+            divideOneSoilLayerU2L(shlwsl, plnew3, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2], soil.peat.shlwdza[3]);
+            insertAfter(plnew3, shlwsl);
+            
+            PeatLayer* plnew2 = new PeatLayer(soil.peat.shlwdza[2], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew2, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1],soil.peat.shlwdza[2]);
+            insertAfter(plnew2, shlwsl);
+            
+            PeatLayer* plnew1 = new PeatLayer(soil.peat.shlwdza[1], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew1, soil.peat.shlwdza[0], soil.peat.shlwdza[1]);
+            insertAfter(plnew1, shlwsl);
 
-	} else {
+        } else if (soil.peat.shlwnum == 5) {
+            SoilLayer* shlwsl = dynamic_cast<SoilLayer*> (fstshlwl);
+            
+            PeatLayer* plnew4 = new PeatLayer(soil.peat.shlwdza[4], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew4, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3], soil.peat.shlwdza[4]);
+            insertAfter(plnew4, shlwsl);
+            
+            PeatLayer* plnew3 = new PeatLayer(soil.peat.shlwdza[3], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew3, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2], soil.peat.shlwdza[3]);
+            insertAfter(plnew3, shlwsl);
+            
+            PeatLayer* plnew2 = new PeatLayer(soil.peat.shlwdza[2], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew2, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1],soil.peat.shlwdza[2]);
+            insertAfter(plnew2, shlwsl);
+            
+            PeatLayer* plnew1 = new PeatLayer(soil.peat.shlwdza[1], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew1, soil.peat.shlwdza[0], soil.peat.shlwdza[1]);
+            insertAfter(plnew1, shlwsl);
+            
+        } else if (soil.peat.shlwnum == 6) {
+            SoilLayer* shlwsl = dynamic_cast<SoilLayer*> (fstshlwl);
+            
+            PeatLayer* plnew5 = new PeatLayer(soil.peat.shlwdza[5], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew5, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4], soil.peat.shlwdza[5]);
+            insertAfter(plnew5, shlwsl);
+            
+            PeatLayer* plnew4 = new PeatLayer(soil.peat.shlwdza[4], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew4, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3], soil.peat.shlwdza[4]);
+            insertAfter(plnew4, shlwsl);
+            
+            PeatLayer* plnew3 = new PeatLayer(soil.peat.shlwdza[3], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew3, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2], soil.peat.shlwdza[3]);
+            insertAfter(plnew3, shlwsl);
+            
+            PeatLayer* plnew2 = new PeatLayer(soil.peat.shlwdza[2], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew2, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1],soil.peat.shlwdza[2]);
+            insertAfter(plnew2, shlwsl);
+            
+            PeatLayer* plnew1 = new PeatLayer(soil.peat.shlwdza[1], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew1, soil.peat.shlwdza[0], soil.peat.shlwdza[1]);
+            insertAfter(plnew1, shlwsl);
+            
+        } else if (soil.peat.shlwnum == 7) {
+            SoilLayer* shlwsl = dynamic_cast<SoilLayer*> (fstshlwl);
+            
+            PeatLayer* plnew6 = new PeatLayer(soil.peat.shlwdza[6], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew6, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5], soil.peat.shlwdza[6]);
+            insertAfter(plnew6, shlwsl);
+
+            
+            PeatLayer* plnew5 = new PeatLayer(soil.peat.shlwdza[5], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew5, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4], soil.peat.shlwdza[5]);
+            insertAfter(plnew5, shlwsl);
+            
+            PeatLayer* plnew4 = new PeatLayer(soil.peat.shlwdza[4], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew4, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3], soil.peat.shlwdza[4]);
+            insertAfter(plnew4, shlwsl);
+            
+            PeatLayer* plnew3 = new PeatLayer(soil.peat.shlwdza[3], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew3, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2], soil.peat.shlwdza[3]);
+            insertAfter(plnew3, shlwsl);
+            
+            PeatLayer* plnew2 = new PeatLayer(soil.peat.shlwdza[2], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew2, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1],soil.peat.shlwdza[2]);
+            insertAfter(plnew2, shlwsl);
+            
+            PeatLayer* plnew1 = new PeatLayer(soil.peat.shlwdza[1], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew1, soil.peat.shlwdza[0], soil.peat.shlwdza[1]);
+            insertAfter(plnew1, shlwsl);
+            
+        }  else if (soil.peat.shlwnum == 8) {
+            SoilLayer* shlwsl = dynamic_cast<SoilLayer*> (fstshlwl);
+            
+            PeatLayer* plnew7 = new PeatLayer(soil.peat.shlwdza[7], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew7, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6], soil.peat.shlwdza[7]);
+            insertAfter(plnew7, shlwsl);
+            
+            PeatLayer* plnew6 = new PeatLayer(soil.peat.shlwdza[6], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew6, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5], soil.peat.shlwdza[6]);
+            insertAfter(plnew6, shlwsl);
+            
+            PeatLayer* plnew5 = new PeatLayer(soil.peat.shlwdza[5], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew5, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4], soil.peat.shlwdza[5]);
+            insertAfter(plnew5, shlwsl);
+            
+            PeatLayer* plnew4 = new PeatLayer(soil.peat.shlwdza[4], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew4, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3], soil.peat.shlwdza[4]);
+            insertAfter(plnew4, shlwsl);
+            
+            PeatLayer* plnew3 = new PeatLayer(soil.peat.shlwdza[3], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew3, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2], soil.peat.shlwdza[3]);
+            insertAfter(plnew3, shlwsl);
+            
+            PeatLayer* plnew2 = new PeatLayer(soil.peat.shlwdza[2], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew2, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1],soil.peat.shlwdza[2]);
+            insertAfter(plnew2, shlwsl);
+            
+            PeatLayer* plnew1 = new PeatLayer(soil.peat.shlwdza[1], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew1, soil.peat.shlwdza[0], soil.peat.shlwdza[1]);
+            insertAfter(plnew1, shlwsl);
+            
+        }  else if (soil.peat.shlwnum == 9) {
+            SoilLayer* shlwsl = dynamic_cast<SoilLayer*> (fstshlwl);
+            
+            PeatLayer* plnew8 = new PeatLayer(soil.peat.shlwdza[8], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew8, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7], soil.peat.shlwdza[8]);
+            insertAfter(plnew8, shlwsl);
+
+            PeatLayer* plnew7 = new PeatLayer(soil.peat.shlwdza[7], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew7, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6], soil.peat.shlwdza[7]);
+            insertAfter(plnew7, shlwsl);
+            
+            PeatLayer* plnew6 = new PeatLayer(soil.peat.shlwdza[6], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew6, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5], soil.peat.shlwdza[6]);
+            insertAfter(plnew6, shlwsl);
+            
+            PeatLayer* plnew5 = new PeatLayer(soil.peat.shlwdza[5], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew5, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4], soil.peat.shlwdza[5]);
+            insertAfter(plnew5, shlwsl);
+            
+            PeatLayer* plnew4 = new PeatLayer(soil.peat.shlwdza[4], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew4, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3], soil.peat.shlwdza[4]);
+            insertAfter(plnew4, shlwsl);
+            
+            PeatLayer* plnew3 = new PeatLayer(soil.peat.shlwdza[3], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew3, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2], soil.peat.shlwdza[3]);
+            insertAfter(plnew3, shlwsl);
+            
+            PeatLayer* plnew2 = new PeatLayer(soil.peat.shlwdza[2], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew2, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1],soil.peat.shlwdza[2]);
+            insertAfter(plnew2, shlwsl);
+            
+            PeatLayer* plnew1 = new PeatLayer(soil.peat.shlwdza[1], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew1, soil.peat.shlwdza[0], soil.peat.shlwdza[1]);
+            insertAfter(plnew1, shlwsl);
+            
+        }  else if (soil.peat.shlwnum == 10) {
+            SoilLayer* shlwsl = dynamic_cast<SoilLayer*> (fstshlwl);
+            
+            PeatLayer* plnew9 = new PeatLayer(soil.peat.shlwdza[9], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew9, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8], soil.peat.shlwdza[9]);
+            insertAfter(plnew9, shlwsl);
+
+            PeatLayer* plnew8 = new PeatLayer(soil.peat.shlwdza[8], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew8, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7], soil.peat.shlwdza[8]);
+            insertAfter(plnew8, shlwsl);
+            
+            PeatLayer* plnew7 = new PeatLayer(soil.peat.shlwdza[7], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew7, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6], soil.peat.shlwdza[7]);
+            insertAfter(plnew7, shlwsl);
+            
+            PeatLayer* plnew6 = new PeatLayer(soil.peat.shlwdza[6], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew6, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5], soil.peat.shlwdza[6]);
+            insertAfter(plnew6, shlwsl);
+            
+            PeatLayer* plnew5 = new PeatLayer(soil.peat.shlwdza[5], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew5, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4], soil.peat.shlwdza[5]);
+            insertAfter(plnew5, shlwsl);
+            
+            PeatLayer* plnew4 = new PeatLayer(soil.peat.shlwdza[4], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew4, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3], soil.peat.shlwdza[4]);
+            insertAfter(plnew4, shlwsl);
+            
+            PeatLayer* plnew3 = new PeatLayer(soil.peat.shlwdza[3], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew3, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2], soil.peat.shlwdza[3]);
+            insertAfter(plnew3, shlwsl);
+            
+            PeatLayer* plnew2 = new PeatLayer(soil.peat.shlwdza[2], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew2, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1],soil.peat.shlwdza[2]);
+            insertAfter(plnew2, shlwsl);
+            
+            PeatLayer* plnew1 = new PeatLayer(soil.peat.shlwdza[1], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew1, soil.peat.shlwdza[0], soil.peat.shlwdza[1]);
+            insertAfter(plnew1, shlwsl);
+            
+        }  else if (soil.peat.shlwnum == 11) {
+            SoilLayer* shlwsl = dynamic_cast<SoilLayer*> (fstshlwl);
+           
+            PeatLayer* plnew10 = new PeatLayer(soil.peat.shlwdza[10], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew10, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9], soil.peat.shlwdza[10]);
+            insertAfter(plnew10, shlwsl);
+
+            PeatLayer* plnew9 = new PeatLayer(soil.peat.shlwdza[9], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew9, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8], soil.peat.shlwdza[9]);
+            insertAfter(plnew9, shlwsl);
+            
+            PeatLayer* plnew8 = new PeatLayer(soil.peat.shlwdza[8], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew8, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7], soil.peat.shlwdza[8]);
+            insertAfter(plnew8, shlwsl);
+            
+            PeatLayer* plnew7 = new PeatLayer(soil.peat.shlwdza[7], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew7, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6], soil.peat.shlwdza[7]);
+            insertAfter(plnew7, shlwsl);
+            
+            PeatLayer* plnew6 = new PeatLayer(soil.peat.shlwdza[6], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew6, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5], soil.peat.shlwdza[6]);
+            insertAfter(plnew6, shlwsl);
+            
+            PeatLayer* plnew5 = new PeatLayer(soil.peat.shlwdza[5], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew5, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4], soil.peat.shlwdza[5]);
+            insertAfter(plnew5, shlwsl);
+            
+            PeatLayer* plnew4 = new PeatLayer(soil.peat.shlwdza[4], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew4, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3], soil.peat.shlwdza[4]);
+            insertAfter(plnew4, shlwsl);
+            
+            PeatLayer* plnew3 = new PeatLayer(soil.peat.shlwdza[3], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew3, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2], soil.peat.shlwdza[3]);
+            insertAfter(plnew3, shlwsl);
+            
+            PeatLayer* plnew2 = new PeatLayer(soil.peat.shlwdza[2], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew2, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1],soil.peat.shlwdza[2]);
+            insertAfter(plnew2, shlwsl);
+            
+            PeatLayer* plnew1 = new PeatLayer(soil.peat.shlwdza[1], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew1, soil.peat.shlwdza[0], soil.peat.shlwdza[1]);
+            insertAfter(plnew1, shlwsl);
+            
+        }   else if (soil.peat.shlwnum == 12) {
+            SoilLayer* shlwsl = dynamic_cast<SoilLayer*> (fstshlwl);
+            
+            PeatLayer* plnew11 = new PeatLayer(soil.peat.shlwdza[11], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew11, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10], soil.peat.shlwdza[11]);
+            insertAfter(plnew11, shlwsl);
+            
+            PeatLayer* plnew9 = new PeatLayer(soil.peat.shlwdza[9], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew9, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8], soil.peat.shlwdza[9]);
+            insertAfter(plnew9, shlwsl);
+            
+            PeatLayer* plnew8 = new PeatLayer(soil.peat.shlwdza[8], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew8, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7], soil.peat.shlwdza[8]);
+            insertAfter(plnew8, shlwsl);
+            
+            PeatLayer* plnew7 = new PeatLayer(soil.peat.shlwdza[7], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew7, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6], soil.peat.shlwdza[7]);
+            insertAfter(plnew7, shlwsl);
+            
+            PeatLayer* plnew6 = new PeatLayer(soil.peat.shlwdza[6], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew6, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5], soil.peat.shlwdza[6]);
+            insertAfter(plnew6, shlwsl);
+            
+            PeatLayer* plnew5 = new PeatLayer(soil.peat.shlwdza[5], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew5, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4], soil.peat.shlwdza[5]);
+            insertAfter(plnew5, shlwsl);
+            
+            PeatLayer* plnew4 = new PeatLayer(soil.peat.shlwdza[4], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew4, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3], soil.peat.shlwdza[4]);
+            insertAfter(plnew4, shlwsl);
+            
+            PeatLayer* plnew3 = new PeatLayer(soil.peat.shlwdza[3], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew3, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2], soil.peat.shlwdza[3]);
+            insertAfter(plnew3, shlwsl);
+            
+            PeatLayer* plnew2 = new PeatLayer(soil.peat.shlwdza[2], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew2, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1],soil.peat.shlwdza[2]);
+            insertAfter(plnew2, shlwsl);
+            
+            PeatLayer* plnew1 = new PeatLayer(soil.peat.shlwdza[1], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew1, soil.peat.shlwdza[0], soil.peat.shlwdza[1]);
+            insertAfter(plnew1, shlwsl);
+            
+        }   else if (soil.peat.shlwnum == 13) {
+            SoilLayer* shlwsl = dynamic_cast<SoilLayer*> (fstshlwl);
+            
+            PeatLayer* plnew12 = new PeatLayer(soil.peat.shlwdza[12], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew12, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10]+soil.peat.shlwdza[11], soil.peat.shlwdza[12]);
+            insertAfter(plnew12, shlwsl);
+            
+            PeatLayer* plnew11 = new PeatLayer(soil.peat.shlwdza[11], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew11, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10], soil.peat.shlwdza[11]);
+            insertAfter(plnew11, shlwsl);
+            
+            PeatLayer* plnew9 = new PeatLayer(soil.peat.shlwdza[9], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew9, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8], soil.peat.shlwdza[9]);
+            insertAfter(plnew9, shlwsl);
+            
+            PeatLayer* plnew8 = new PeatLayer(soil.peat.shlwdza[8], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew8, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7], soil.peat.shlwdza[8]);
+            insertAfter(plnew8, shlwsl);
+            
+            PeatLayer* plnew7 = new PeatLayer(soil.peat.shlwdza[7], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew7, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6], soil.peat.shlwdza[7]);
+            insertAfter(plnew7, shlwsl);
+            
+            PeatLayer* plnew6 = new PeatLayer(soil.peat.shlwdza[6], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew6, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5], soil.peat.shlwdza[6]);
+            insertAfter(plnew6, shlwsl);
+            
+            PeatLayer* plnew5 = new PeatLayer(soil.peat.shlwdza[5], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew5, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4], soil.peat.shlwdza[5]);
+            insertAfter(plnew5, shlwsl);
+            
+            PeatLayer* plnew4 = new PeatLayer(soil.peat.shlwdza[4], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew4, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3], soil.peat.shlwdza[4]);
+            insertAfter(plnew4, shlwsl);
+            
+            PeatLayer* plnew3 = new PeatLayer(soil.peat.shlwdza[3], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew3, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2], soil.peat.shlwdza[3]);
+            insertAfter(plnew3, shlwsl);
+            
+            PeatLayer* plnew2 = new PeatLayer(soil.peat.shlwdza[2], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew2, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1],soil.peat.shlwdza[2]);
+            insertAfter(plnew2, shlwsl);
+            
+            PeatLayer* plnew1 = new PeatLayer(soil.peat.shlwdza[1], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew1, soil.peat.shlwdza[0], soil.peat.shlwdza[1]);
+            insertAfter(plnew1, shlwsl);
+            
+        }   else if (soil.peat.shlwnum == 14) {
+            SoilLayer* shlwsl = dynamic_cast<SoilLayer*> (fstshlwl);
+            
+            PeatLayer* plnew13 = new PeatLayer(soil.peat.shlwdza[13], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew13, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10]+soil.peat.shlwdza[11]+soil.peat.shlwdza[12], soil.peat.shlwdza[13]);
+            insertAfter(plnew13, shlwsl);
+
+            PeatLayer* plnew12 = new PeatLayer(soil.peat.shlwdza[12], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew12, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10]+soil.peat.shlwdza[11], soil.peat.shlwdza[12]);
+            insertAfter(plnew12, shlwsl);
+            
+            PeatLayer* plnew11 = new PeatLayer(soil.peat.shlwdza[11], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew11, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10], soil.peat.shlwdza[11]);
+            insertAfter(plnew11, shlwsl);
+            
+            PeatLayer* plnew9 = new PeatLayer(soil.peat.shlwdza[9], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew9, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8], soil.peat.shlwdza[9]);
+            insertAfter(plnew9, shlwsl);
+            
+            PeatLayer* plnew8 = new PeatLayer(soil.peat.shlwdza[8], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew8, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7], soil.peat.shlwdza[8]);
+            insertAfter(plnew8, shlwsl);
+            
+            PeatLayer* plnew7 = new PeatLayer(soil.peat.shlwdza[7], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew7, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6], soil.peat.shlwdza[7]);
+            insertAfter(plnew7, shlwsl);
+            
+            PeatLayer* plnew6 = new PeatLayer(soil.peat.shlwdza[6], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew6, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5], soil.peat.shlwdza[6]);
+            insertAfter(plnew6, shlwsl);
+            
+            PeatLayer* plnew5 = new PeatLayer(soil.peat.shlwdza[5], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew5, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4], soil.peat.shlwdza[5]);
+            insertAfter(plnew5, shlwsl);
+            
+            PeatLayer* plnew4 = new PeatLayer(soil.peat.shlwdza[4], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew4, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3], soil.peat.shlwdza[4]);
+            insertAfter(plnew4, shlwsl);
+            
+            PeatLayer* plnew3 = new PeatLayer(soil.peat.shlwdza[3], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew3, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2], soil.peat.shlwdza[3]);
+            insertAfter(plnew3, shlwsl);
+            
+            PeatLayer* plnew2 = new PeatLayer(soil.peat.shlwdza[2], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew2, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1],soil.peat.shlwdza[2]);
+            insertAfter(plnew2, shlwsl);
+            
+            PeatLayer* plnew1 = new PeatLayer(soil.peat.shlwdza[1], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew1, soil.peat.shlwdza[0], soil.peat.shlwdza[1]);
+            insertAfter(plnew1, shlwsl);
+            
+        }  else if (soil.peat.shlwnum == 15) {
+            SoilLayer* shlwsl = dynamic_cast<SoilLayer*> (fstshlwl);
+            
+            PeatLayer* plnew14 = new PeatLayer(soil.peat.shlwdza[14], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew14, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10]+soil.peat.shlwdza[11]+soil.peat.shlwdza[12]+soil.peat.shlwdza[13], soil.peat.shlwdza[14]);
+            insertAfter(plnew14, shlwsl);
+            
+            PeatLayer* plnew13 = new PeatLayer(soil.peat.shlwdza[13], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew13, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10]+soil.peat.shlwdza[11]+soil.peat.shlwdza[12], soil.peat.shlwdza[13]);
+            insertAfter(plnew13, shlwsl);
+            
+            PeatLayer* plnew12 = new PeatLayer(soil.peat.shlwdza[12], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew12, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10]+soil.peat.shlwdza[11], soil.peat.shlwdza[12]);
+            insertAfter(plnew12, shlwsl);
+            
+            PeatLayer* plnew11 = new PeatLayer(soil.peat.shlwdza[11], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew11, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10], soil.peat.shlwdza[11]);
+            insertAfter(plnew11, shlwsl);
+            
+            PeatLayer* plnew9 = new PeatLayer(soil.peat.shlwdza[9], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew9, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8], soil.peat.shlwdza[9]);
+            insertAfter(plnew9, shlwsl);
+            
+            PeatLayer* plnew8 = new PeatLayer(soil.peat.shlwdza[8], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew8, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7], soil.peat.shlwdza[8]);
+            insertAfter(plnew8, shlwsl);
+            
+            PeatLayer* plnew7 = new PeatLayer(soil.peat.shlwdza[7], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew7, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6], soil.peat.shlwdza[7]);
+            insertAfter(plnew7, shlwsl);
+            
+            PeatLayer* plnew6 = new PeatLayer(soil.peat.shlwdza[6], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew6, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5], soil.peat.shlwdza[6]);
+            insertAfter(plnew6, shlwsl);
+            
+            PeatLayer* plnew5 = new PeatLayer(soil.peat.shlwdza[5], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew5, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4], soil.peat.shlwdza[5]);
+            insertAfter(plnew5, shlwsl);
+            
+            PeatLayer* plnew4 = new PeatLayer(soil.peat.shlwdza[4], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew4, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3], soil.peat.shlwdza[4]);
+            insertAfter(plnew4, shlwsl);
+            
+            PeatLayer* plnew3 = new PeatLayer(soil.peat.shlwdza[3], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew3, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2], soil.peat.shlwdza[3]);
+            insertAfter(plnew3, shlwsl);
+            
+            PeatLayer* plnew2 = new PeatLayer(soil.peat.shlwdza[2], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew2, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1],soil.peat.shlwdza[2]);
+            insertAfter(plnew2, shlwsl);
+            
+            PeatLayer* plnew1 = new PeatLayer(soil.peat.shlwdza[1], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew1, soil.peat.shlwdza[0], soil.peat.shlwdza[1]);
+            insertAfter(plnew1, shlwsl);
+            
+        }  else if (soil.peat.shlwnum == 16) {
+            SoilLayer* shlwsl = dynamic_cast<SoilLayer*> (fstshlwl);
+            
+            PeatLayer* plnew15 = new PeatLayer(soil.peat.shlwdza[15], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew15, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10]+soil.peat.shlwdza[11]+soil.peat.shlwdza[12]+soil.peat.shlwdza[13]+soil.peat.shlwdza[14], soil.peat.shlwdza[15]);
+            insertAfter(plnew15, shlwsl);
+
+            PeatLayer* plnew14 = new PeatLayer(soil.peat.shlwdza[14], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew14, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10]+soil.peat.shlwdza[11]+soil.peat.shlwdza[12]+soil.peat.shlwdza[13], soil.peat.shlwdza[14]);
+            insertAfter(plnew14, shlwsl);
+            
+            PeatLayer* plnew13 = new PeatLayer(soil.peat.shlwdza[13], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew13, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10]+soil.peat.shlwdza[11]+soil.peat.shlwdza[12], soil.peat.shlwdza[13]);
+            insertAfter(plnew13, shlwsl);
+            
+            PeatLayer* plnew12 = new PeatLayer(soil.peat.shlwdza[12], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew12, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10]+soil.peat.shlwdza[11], soil.peat.shlwdza[12]);
+            insertAfter(plnew12, shlwsl);
+            
+            PeatLayer* plnew11 = new PeatLayer(soil.peat.shlwdza[11], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew11, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10], soil.peat.shlwdza[11]);
+            insertAfter(plnew11, shlwsl);
+            
+            PeatLayer* plnew9 = new PeatLayer(soil.peat.shlwdza[9], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew9, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8], soil.peat.shlwdza[9]);
+            insertAfter(plnew9, shlwsl);
+            
+            PeatLayer* plnew8 = new PeatLayer(soil.peat.shlwdza[8], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew8, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7], soil.peat.shlwdza[8]);
+            insertAfter(plnew8, shlwsl);
+            
+            PeatLayer* plnew7 = new PeatLayer(soil.peat.shlwdza[7], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew7, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6], soil.peat.shlwdza[7]);
+            insertAfter(plnew7, shlwsl);
+            
+            PeatLayer* plnew6 = new PeatLayer(soil.peat.shlwdza[6], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew6, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5], soil.peat.shlwdza[6]);
+            insertAfter(plnew6, shlwsl);
+            
+            PeatLayer* plnew5 = new PeatLayer(soil.peat.shlwdza[5], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew5, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4], soil.peat.shlwdza[5]);
+            insertAfter(plnew5, shlwsl);
+            
+            PeatLayer* plnew4 = new PeatLayer(soil.peat.shlwdza[4], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew4, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3], soil.peat.shlwdza[4]);
+            insertAfter(plnew4, shlwsl);
+            
+            PeatLayer* plnew3 = new PeatLayer(soil.peat.shlwdza[3], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew3, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2], soil.peat.shlwdza[3]);
+            insertAfter(plnew3, shlwsl);
+            
+            PeatLayer* plnew2 = new PeatLayer(soil.peat.shlwdza[2], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew2, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1],soil.peat.shlwdza[2]);
+            insertAfter(plnew2, shlwsl);
+            
+            PeatLayer* plnew1 = new PeatLayer(soil.peat.shlwdza[1], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew1, soil.peat.shlwdza[0], soil.peat.shlwdza[1]);
+            insertAfter(plnew1, shlwsl);
+            
+        } else if (soil.peat.shlwnum == 17) {
+            SoilLayer* shlwsl = dynamic_cast<SoilLayer*> (fstshlwl);
+            
+            PeatLayer* plnew16 = new PeatLayer(soil.peat.shlwdza[16], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew16, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10]+soil.peat.shlwdza[11]+soil.peat.shlwdza[12]+soil.peat.shlwdza[13]+soil.peat.shlwdza[14]+soil.peat.shlwdza[15], soil.peat.shlwdza[16]);
+            insertAfter(plnew16, shlwsl);
+            
+            PeatLayer* plnew15 = new PeatLayer(soil.peat.shlwdza[15], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew15, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10]+soil.peat.shlwdza[11]+soil.peat.shlwdza[12]+soil.peat.shlwdza[13]+soil.peat.shlwdza[14], soil.peat.shlwdza[15]);
+            insertAfter(plnew15, shlwsl);
+            
+            PeatLayer* plnew14 = new PeatLayer(soil.peat.shlwdza[14], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew14, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10]+soil.peat.shlwdza[11]+soil.peat.shlwdza[12]+soil.peat.shlwdza[13], soil.peat.shlwdza[14]);
+            insertAfter(plnew14, shlwsl);
+            
+            PeatLayer* plnew13 = new PeatLayer(soil.peat.shlwdza[13], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew13, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10]+soil.peat.shlwdza[11]+soil.peat.shlwdza[12], soil.peat.shlwdza[13]);
+            insertAfter(plnew13, shlwsl);
+            
+            PeatLayer* plnew12 = new PeatLayer(soil.peat.shlwdza[12], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew12, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10]+soil.peat.shlwdza[11], soil.peat.shlwdza[12]);
+            insertAfter(plnew12, shlwsl);
+            
+            PeatLayer* plnew11 = new PeatLayer(soil.peat.shlwdza[11], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew11, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10], soil.peat.shlwdza[11]);
+            insertAfter(plnew11, shlwsl);
+            
+            PeatLayer* plnew9 = new PeatLayer(soil.peat.shlwdza[9], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew9, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8], soil.peat.shlwdza[9]);
+            insertAfter(plnew9, shlwsl);
+            
+            PeatLayer* plnew8 = new PeatLayer(soil.peat.shlwdza[8], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew8, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7], soil.peat.shlwdza[8]);
+            insertAfter(plnew8, shlwsl);
+            
+            PeatLayer* plnew7 = new PeatLayer(soil.peat.shlwdza[7], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew7, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6], soil.peat.shlwdza[7]);
+            insertAfter(plnew7, shlwsl);
+            
+            PeatLayer* plnew6 = new PeatLayer(soil.peat.shlwdza[6], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew6, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5], soil.peat.shlwdza[6]);
+            insertAfter(plnew6, shlwsl);
+            
+            PeatLayer* plnew5 = new PeatLayer(soil.peat.shlwdza[5], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew5, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4], soil.peat.shlwdza[5]);
+            insertAfter(plnew5, shlwsl);
+            
+            PeatLayer* plnew4 = new PeatLayer(soil.peat.shlwdza[4], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew4, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3], soil.peat.shlwdza[4]);
+            insertAfter(plnew4, shlwsl);
+            
+            PeatLayer* plnew3 = new PeatLayer(soil.peat.shlwdza[3], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew3, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2], soil.peat.shlwdza[3]);
+            insertAfter(plnew3, shlwsl);
+            
+            PeatLayer* plnew2 = new PeatLayer(soil.peat.shlwdza[2], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew2, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1],soil.peat.shlwdza[2]);
+            insertAfter(plnew2, shlwsl);
+            
+            PeatLayer* plnew1 = new PeatLayer(soil.peat.shlwdza[1], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew1, soil.peat.shlwdza[0], soil.peat.shlwdza[1]);
+            insertAfter(plnew1, shlwsl);
+            
+        } else if (soil.peat.shlwnum == 18) {
+            SoilLayer* shlwsl = dynamic_cast<SoilLayer*> (fstshlwl);
+            
+            PeatLayer* plnew17 = new PeatLayer(soil.peat.shlwdza[17], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew17, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10]+soil.peat.shlwdza[11]+soil.peat.shlwdza[12]+soil.peat.shlwdza[13]+soil.peat.shlwdza[14]+soil.peat.shlwdza[15]+soil.peat.shlwdza[16], soil.peat.shlwdza[17]);
+            insertAfter(plnew17, shlwsl);
+            
+            PeatLayer* plnew16 = new PeatLayer(soil.peat.shlwdza[16], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew16, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10]+soil.peat.shlwdza[11]+soil.peat.shlwdza[12]+soil.peat.shlwdza[13]+soil.peat.shlwdza[14]+soil.peat.shlwdza[15], soil.peat.shlwdza[16]);
+            insertAfter(plnew16, shlwsl);
+            
+            PeatLayer* plnew15 = new PeatLayer(soil.peat.shlwdza[15], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew15, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10]+soil.peat.shlwdza[11]+soil.peat.shlwdza[12]+soil.peat.shlwdza[13]+soil.peat.shlwdza[14], soil.peat.shlwdza[15]);
+            insertAfter(plnew15, shlwsl);
+            
+            PeatLayer* plnew14 = new PeatLayer(soil.peat.shlwdza[14], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew14, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10]+soil.peat.shlwdza[11]+soil.peat.shlwdza[12]+soil.peat.shlwdza[13], soil.peat.shlwdza[14]);
+            insertAfter(plnew14, shlwsl);
+            
+            PeatLayer* plnew13 = new PeatLayer(soil.peat.shlwdza[13], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew13, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10]+soil.peat.shlwdza[11]+soil.peat.shlwdza[12], soil.peat.shlwdza[13]);
+            insertAfter(plnew13, shlwsl);
+            
+            PeatLayer* plnew12 = new PeatLayer(soil.peat.shlwdza[12], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew12, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10]+soil.peat.shlwdza[11], soil.peat.shlwdza[12]);
+            insertAfter(plnew12, shlwsl);
+            
+            PeatLayer* plnew11 = new PeatLayer(soil.peat.shlwdza[11], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew11, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10], soil.peat.shlwdza[11]);
+            insertAfter(plnew11, shlwsl);
+            
+            PeatLayer* plnew9 = new PeatLayer(soil.peat.shlwdza[9], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew9, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8], soil.peat.shlwdza[9]);
+            insertAfter(plnew9, shlwsl);
+            
+            PeatLayer* plnew8 = new PeatLayer(soil.peat.shlwdza[8], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew8, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7], soil.peat.shlwdza[8]);
+            insertAfter(plnew8, shlwsl);
+            
+            PeatLayer* plnew7 = new PeatLayer(soil.peat.shlwdza[7], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew7, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6], soil.peat.shlwdza[7]);
+            insertAfter(plnew7, shlwsl);
+            
+            PeatLayer* plnew6 = new PeatLayer(soil.peat.shlwdza[6], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew6, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5], soil.peat.shlwdza[6]);
+            insertAfter(plnew6, shlwsl);
+            
+            PeatLayer* plnew5 = new PeatLayer(soil.peat.shlwdza[5], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew5, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4], soil.peat.shlwdza[5]);
+            insertAfter(plnew5, shlwsl);
+            
+            PeatLayer* plnew4 = new PeatLayer(soil.peat.shlwdza[4], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew4, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3], soil.peat.shlwdza[4]);
+            insertAfter(plnew4, shlwsl);
+            
+            PeatLayer* plnew3 = new PeatLayer(soil.peat.shlwdza[3], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew3, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2], soil.peat.shlwdza[3]);
+            insertAfter(plnew3, shlwsl);
+            
+            PeatLayer* plnew2 = new PeatLayer(soil.peat.shlwdza[2], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew2, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1],soil.peat.shlwdza[2]);
+            insertAfter(plnew2, shlwsl);
+            
+            PeatLayer* plnew1 = new PeatLayer(soil.peat.shlwdza[1], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew1, soil.peat.shlwdza[0], soil.peat.shlwdza[1]);
+            insertAfter(plnew1, shlwsl);
+            
+        } else if (soil.peat.shlwnum == 19) {
+            SoilLayer* shlwsl = dynamic_cast<SoilLayer*> (fstshlwl);
+            
+            PeatLayer* plnew18 = new PeatLayer(soil.peat.shlwdza[18], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew18, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10]+soil.peat.shlwdza[11]+soil.peat.shlwdza[12]+soil.peat.shlwdza[13]+soil.peat.shlwdza[14]+soil.peat.shlwdza[15]+soil.peat.shlwdza[16]+soil.peat.shlwdza[17], soil.peat.shlwdza[18]);
+            insertAfter(plnew18, shlwsl);
+            
+            PeatLayer* plnew17 = new PeatLayer(soil.peat.shlwdza[17], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew17, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10]+soil.peat.shlwdza[11]+soil.peat.shlwdza[12]+soil.peat.shlwdza[13]+soil.peat.shlwdza[14]+soil.peat.shlwdza[15]+soil.peat.shlwdza[16], soil.peat.shlwdza[17]);
+            insertAfter(plnew17, shlwsl);
+            
+            PeatLayer* plnew16 = new PeatLayer(soil.peat.shlwdza[16], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew16, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10]+soil.peat.shlwdza[11]+soil.peat.shlwdza[12]+soil.peat.shlwdza[13]+soil.peat.shlwdza[14]+soil.peat.shlwdza[15], soil.peat.shlwdza[16]);
+            insertAfter(plnew16, shlwsl);
+            
+            PeatLayer* plnew15 = new PeatLayer(soil.peat.shlwdza[15], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew15, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10]+soil.peat.shlwdza[11]+soil.peat.shlwdza[12]+soil.peat.shlwdza[13]+soil.peat.shlwdza[14], soil.peat.shlwdza[15]);
+            insertAfter(plnew15, shlwsl);
+            
+            PeatLayer* plnew14 = new PeatLayer(soil.peat.shlwdza[14], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew14, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10]+soil.peat.shlwdza[11]+soil.peat.shlwdza[12]+soil.peat.shlwdza[13], soil.peat.shlwdza[14]);
+            insertAfter(plnew14, shlwsl);
+            
+            PeatLayer* plnew13 = new PeatLayer(soil.peat.shlwdza[13], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew13, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10]+soil.peat.shlwdza[11]+soil.peat.shlwdza[12], soil.peat.shlwdza[13]);
+            insertAfter(plnew13, shlwsl);
+            
+            PeatLayer* plnew12 = new PeatLayer(soil.peat.shlwdza[12], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew12, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10]+soil.peat.shlwdza[11], soil.peat.shlwdza[12]);
+            insertAfter(plnew12, shlwsl);
+            
+            PeatLayer* plnew11 = new PeatLayer(soil.peat.shlwdza[11], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew11, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10], soil.peat.shlwdza[11]);
+            insertAfter(plnew11, shlwsl);
+            
+            PeatLayer* plnew9 = new PeatLayer(soil.peat.shlwdza[9], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew9, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8], soil.peat.shlwdza[9]);
+            insertAfter(plnew9, shlwsl);
+            
+            PeatLayer* plnew8 = new PeatLayer(soil.peat.shlwdza[8], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew8, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7], soil.peat.shlwdza[8]);
+            insertAfter(plnew8, shlwsl);
+            
+            PeatLayer* plnew7 = new PeatLayer(soil.peat.shlwdza[7], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew7, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6], soil.peat.shlwdza[7]);
+            insertAfter(plnew7, shlwsl);
+            
+            PeatLayer* plnew6 = new PeatLayer(soil.peat.shlwdza[6], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew6, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5], soil.peat.shlwdza[6]);
+            insertAfter(plnew6, shlwsl);
+            
+            PeatLayer* plnew5 = new PeatLayer(soil.peat.shlwdza[5], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew5, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4], soil.peat.shlwdza[5]);
+            insertAfter(plnew5, shlwsl);
+            
+            PeatLayer* plnew4 = new PeatLayer(soil.peat.shlwdza[4], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew4, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3], soil.peat.shlwdza[4]);
+            insertAfter(plnew4, shlwsl);
+            
+            PeatLayer* plnew3 = new PeatLayer(soil.peat.shlwdza[3], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew3, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2], soil.peat.shlwdza[3]);
+            insertAfter(plnew3, shlwsl);
+            
+            PeatLayer* plnew2 = new PeatLayer(soil.peat.shlwdza[2], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew2, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1],soil.peat.shlwdza[2]);
+            insertAfter(plnew2, shlwsl);
+            
+            PeatLayer* plnew1 = new PeatLayer(soil.peat.shlwdza[1], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew1, soil.peat.shlwdza[0], soil.peat.shlwdza[1]);
+            insertAfter(plnew1, shlwsl);
+            
+        } else if (soil.peat.shlwnum == 20) {
+            SoilLayer* shlwsl = dynamic_cast<SoilLayer*> (fstshlwl);
+            
+            PeatLayer* plnew19 = new PeatLayer(soil.peat.shlwdza[19], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew19, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10]+soil.peat.shlwdza[11]+soil.peat.shlwdza[12]+soil.peat.shlwdza[13]+soil.peat.shlwdza[14]+soil.peat.shlwdza[15]+soil.peat.shlwdza[16]+soil.peat.shlwdza[17]+soil.peat.shlwdza[18], soil.peat.shlwdza[19]);
+            insertAfter(plnew19, shlwsl);
+            
+            PeatLayer* plnew18 = new PeatLayer(soil.peat.shlwdza[18], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew18, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10]+soil.peat.shlwdza[11]+soil.peat.shlwdza[12]+soil.peat.shlwdza[13]+soil.peat.shlwdza[14]+soil.peat.shlwdza[15]+soil.peat.shlwdza[16]+soil.peat.shlwdza[17], soil.peat.shlwdza[18]);
+            insertAfter(plnew18, shlwsl);
+            
+            PeatLayer* plnew17 = new PeatLayer(soil.peat.shlwdza[17], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew17, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10]+soil.peat.shlwdza[11]+soil.peat.shlwdza[12]+soil.peat.shlwdza[13]+soil.peat.shlwdza[14]+soil.peat.shlwdza[15]+soil.peat.shlwdza[16], soil.peat.shlwdza[17]);
+            insertAfter(plnew17, shlwsl);
+            
+            PeatLayer* plnew16 = new PeatLayer(soil.peat.shlwdza[16], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew16, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10]+soil.peat.shlwdza[11]+soil.peat.shlwdza[12]+soil.peat.shlwdza[13]+soil.peat.shlwdza[14]+soil.peat.shlwdza[15], soil.peat.shlwdza[16]);
+            insertAfter(plnew16, shlwsl);
+            
+            PeatLayer* plnew15 = new PeatLayer(soil.peat.shlwdza[15], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew15, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10]+soil.peat.shlwdza[11]+soil.peat.shlwdza[12]+soil.peat.shlwdza[13]+soil.peat.shlwdza[14], soil.peat.shlwdza[15]);
+            insertAfter(plnew15, shlwsl);
+            
+            PeatLayer* plnew14 = new PeatLayer(soil.peat.shlwdza[14], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew14, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10]+soil.peat.shlwdza[11]+soil.peat.shlwdza[12]+soil.peat.shlwdza[13], soil.peat.shlwdza[14]);
+            insertAfter(plnew14, shlwsl);
+            
+            PeatLayer* plnew13 = new PeatLayer(soil.peat.shlwdza[13], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew13, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10]+soil.peat.shlwdza[11]+soil.peat.shlwdza[12], soil.peat.shlwdza[13]);
+            insertAfter(plnew13, shlwsl);
+            
+            PeatLayer* plnew12 = new PeatLayer(soil.peat.shlwdza[12], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew12, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10]+soil.peat.shlwdza[11], soil.peat.shlwdza[12]);
+            insertAfter(plnew12, shlwsl);
+            
+            PeatLayer* plnew11 = new PeatLayer(soil.peat.shlwdza[11], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew11, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10], soil.peat.shlwdza[11]);
+            insertAfter(plnew11, shlwsl);
+            
+            PeatLayer* plnew9 = new PeatLayer(soil.peat.shlwdza[9], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew9, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8], soil.peat.shlwdza[9]);
+            insertAfter(plnew9, shlwsl);
+            
+            PeatLayer* plnew8 = new PeatLayer(soil.peat.shlwdza[8], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew8, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7], soil.peat.shlwdza[8]);
+            insertAfter(plnew8, shlwsl);
+            
+            PeatLayer* plnew7 = new PeatLayer(soil.peat.shlwdza[7], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew7, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6], soil.peat.shlwdza[7]);
+            insertAfter(plnew7, shlwsl);
+            
+            PeatLayer* plnew6 = new PeatLayer(soil.peat.shlwdza[6], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew6, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5], soil.peat.shlwdza[6]);
+            insertAfter(plnew6, shlwsl);
+            
+            PeatLayer* plnew5 = new PeatLayer(soil.peat.shlwdza[5], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew5, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4], soil.peat.shlwdza[5]);
+            insertAfter(plnew5, shlwsl);
+            
+            PeatLayer* plnew4 = new PeatLayer(soil.peat.shlwdza[4], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew4, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3], soil.peat.shlwdza[4]);
+            insertAfter(plnew4, shlwsl);
+            
+            PeatLayer* plnew3 = new PeatLayer(soil.peat.shlwdza[3], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew3, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2], soil.peat.shlwdza[3]);
+            insertAfter(plnew3, shlwsl);
+            
+            PeatLayer* plnew2 = new PeatLayer(soil.peat.shlwdza[2], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew2, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1],soil.peat.shlwdza[2]);
+            insertAfter(plnew2, shlwsl);
+            
+            PeatLayer* plnew1 = new PeatLayer(soil.peat.shlwdza[1], 1);
+            divideOneSoilLayerU2L(shlwsl, plnew1, soil.peat.shlwdza[0], soil.peat.shlwdza[1]);
+            insertAfter(plnew1, shlwsl);
+        }
+} else {
 		soil.peat.oldshlwthick = soil.peat.shlwthick;
 		soil.peat.shlwthick = thick;
 		soil.peat.olddlstshlw = soil.peat.dlstshlw;

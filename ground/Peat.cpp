@@ -126,59 +126,342 @@ void Peat::initShlwThicknesses(const double & thickness) {
 		olddlstshlw = shlwdza[shlwnum - 1]; //Yuan:???
 	shlwthick = thickness;
 
-	if (thickness < 0.02)
-		shlwthick = 0.02;
-	shlwnum = 0;
-	if (thickness < 0.00) { //Yuan: always allow at least ONE shlwnum
-		shlwdza[0] = -1;
-		shlwdza[1] = -1;
-		shlwdza[2] = -1;
-		shlwnum = 0;
-	} else if (thickness < 0.04) {
-		shlwdza[0] = thickness;
-		shlwdza[1] = -1;
-		shlwdza[2] = -1;
-		shlwnum = 1;
-	} else if (thickness < 0.06) {
-		shlwdza[0] = 0.02;
-		shlwdza[1] = thickness - 0.02;
-		shlwdza[2] = -1;
-		shlwnum = 2;
-	} else if (thickness < 0.10) {
-		shlwdza[0] = 0.03;
-		shlwdza[1] = thickness - 0.03;
-		shlwdza[2] = -1;
-		shlwnum = 2;
-	} else if (thickness < 0.15) {
-		shlwdza[0] = 0.02;
-		shlwdza[1] = 0.04;
-		shlwdza[2] = thickness - 0.06;
-		shlwnum = 3;
-	} else if (thickness < 0.20) {
-		shlwdza[0] = 0.03;
-		shlwdza[1] = 0.06;
-		shlwdza[2] = thickness - 0.09;
-		shlwnum = 3;
-	} else if (thickness < 0.28) {
-		shlwdza[0] = 0.04;
-		shlwdza[1] = 0.08;
-		shlwdza[2] = thickness - 0.12;
-		shlwnum = 3;
-	} else if (thickness < 0.40) {
-		shlwdza[0] = 0.05;
-		shlwdza[1] = 0.11;
-		shlwdza[2] = thickness - 0.16;
-		shlwnum = 3;
-	} else if (thickness >= 0.4) {
+//	if (thickness < 0.02)
+//		shlwthick = 0.02;
+//	shlwnum = 0;
+//	if (thickness < 0.00) { //Yuan: always allow at least ONE shlwnum
+//		shlwdza[0] = -1;
+//		shlwdza[1] = -1;
+//		shlwdza[2] = -1;
+//		shlwnum = 0;
+//	} else if (thickness < 0.04) {
+//		shlwdza[0] = thickness;
+//		shlwdza[1] = -1;
+//		shlwdza[2] = -1;
+//		shlwnum = 1;
+//	} else if (thickness < 0.06) {
+//		shlwdza[0] = 0.02;
+//		shlwdza[1] = thickness - 0.02;
+//		shlwdza[2] = -1;
+//		shlwnum = 2;
+//	} else if (thickness < 0.10) {
+//		shlwdza[0] = 0.03;
+//		shlwdza[1] = thickness - 0.03;
+//		shlwdza[2] = -1;
+//		shlwnum = 2;
+//	} else if (thickness < 0.15) {
+//		shlwdza[0] = 0.02;
+//		shlwdza[1] = 0.04;
+//		shlwdza[2] = thickness - 0.06;
+//		shlwnum = 3;
+//	} else if (thickness < 0.20) {
+//		shlwdza[0] = 0.03;
+//		shlwdza[1] = 0.06;
+//		shlwdza[2] = thickness - 0.09;
+//		shlwnum = 3;
+//	} else if (thickness < 0.28) {
+//		shlwdza[0] = 0.04;
+//		shlwdza[1] = 0.08;
+//		shlwdza[2] = thickness - 0.12;
+//		shlwnum = 3;
+//	} else if (thickness < 0.40) {
+//		shlwdza[0] = 0.05;
+//		shlwdza[1] = 0.11;
+//		shlwdza[2] = thickness - 0.16;
+//		shlwnum = 3;
+//	} else if (thickness >= 0.4) {
+//
+//		shlwdza[0] = 0.1;
+//		shlwdza[1] = 0.2;
+//		shlwdza[2] = thickness - 0.3;
+//		shlwnum = 3;
 
-		shlwdza[0] = 0.1;
-		shlwdza[1] = 0.2;
-		shlwdza[2] = thickness - 0.3;
-		shlwnum = 3;
-	} else {
-		//cout << "the thickness of shlw organic is too big " << thickness<< "\n";
-		//exit(-1);
-	}
+    if (thickness < 0.03)
+        shlwthick = 0.03;
+   
+    shlwnum = 1;
+    
+    if (thickness == 0.03) { //Yuan: always allow at least ONE shlwnum
+        shlwdza[0] = 0.03;
+        shlwdza[1] = -1;
+        shlwdza[2] = -1;
+        shlwnum = 1;
+    } else if (thickness <= 0.06) {
+        shlwdza[0] = 0.03;
+        shlwdza[1] = thickness-0.03;
+        shlwdza[2] = -1;
+        shlwnum = 2;
+    } else if (thickness <= 0.09) {
+        shlwdza[0] = 0.03;
+        shlwdza[1] = 0.03;
+        shlwdza[2] = thickness-0.06;
+        shlwnum = 3;
+    } else if (thickness <= 0.12) {
+        shlwdza[0] = 0.03;
+        shlwdza[1] = 0.03;
+        shlwdza[2] = 0.03;
+        shlwdza[3] = thickness-0.09;
+        shlwnum = 4;
+    } else if (thickness <= 0.15) {
+        shlwdza[0] = 0.03;
+        shlwdza[1] = 0.03;
+        shlwdza[2] = 0.03;
+        shlwdza[3] = 0.03;
+        shlwdza[4] = thickness-0.12;
+        shlwnum = 5;
+    } else if (thickness <= 0.18) {
+        shlwdza[0] = 0.03;
+        shlwdza[1] = 0.03;
+        shlwdza[2] = 0.03;
+        shlwdza[3] = 0.03;
+        shlwdza[4] = 0.03;
+        shlwdza[5] = thickness-0.15;
+        shlwnum = 6;
+    } else if (thickness <= 0.21) {
+        shlwdza[0] = 0.03;
+        shlwdza[1] = 0.03;
+        shlwdza[2] = 0.03;
+        shlwdza[3] = 0.03;
+        shlwdza[4] = 0.03;
+        shlwdza[5] = 0.03;
+        shlwdza[6] = thickness-0.18;
+        shlwnum = 7;
+    } else if (thickness <= 0.24) {
+        shlwdza[0] = 0.03;
+        shlwdza[1] = 0.03;
+        shlwdza[2] = 0.03;
+        shlwdza[3] = 0.03;
+        shlwdza[4] = 0.03;
+        shlwdza[5] = 0.03;
+        shlwdza[6] = 0.03;
+        shlwdza[7] = thickness-0.21;
+        shlwnum = 8;
+    } else if (thickness <= 0.27) {
+        shlwdza[0] = 0.03;
+        shlwdza[1] = 0.03;
+        shlwdza[2] = 0.03;
+        shlwdza[3] = 0.03;
+        shlwdza[4] = 0.03;
+        shlwdza[5] = 0.03;
+        shlwdza[6] = 0.03;
+        shlwdza[7] = 0.03;
+        shlwdza[8] = thickness-0.24;
+        shlwnum = 9;
+    } else if (thickness <= 0.30) {
+        shlwdza[0] = 0.03;
+        shlwdza[1] = 0.03;
+        shlwdza[2] = 0.03;
+        shlwdza[3] = 0.03;
+        shlwdza[4] = 0.03;
+        shlwdza[5] = 0.03;
+        shlwdza[6] = 0.03;
+        shlwdza[7] = 0.03;
+        shlwdza[8] = 0.03;
+        shlwdza[9] = thickness-0.27;
+        shlwnum = 10;
+    } else {
+        shlwdza[0] = 0.03;
+        shlwdza[1] = 0.03;
+        shlwdza[2] = 0.03;
+        shlwdza[3] = 0.03;
+        shlwdza[4] = 0.03;
+        shlwdza[5] = 0.03;
+        shlwdza[6] = 0.03;
+        shlwdza[7] = 0.03;
+        shlwdza[8] = 0.03;
+        shlwdza[9] = 0.03;
+        shlwdza[10] = thickness-0.30;
+        shlwnum = 11;
+    }
+    
+//    else if (thickness <= 0.24) {
+//        shlwdza[0] = 0.02;
+//        shlwdza[1] = 0.02;
+//        shlwdza[2] = 0.02;
+//        shlwdza[3] = 0.02;
+//        shlwdza[4] = 0.02;
+//        shlwdza[5] = 0.02;
+//        shlwdza[6] = 0.02;
+//        shlwdza[7] = 0.02;
+//        shlwdza[8] = 0.02;
+//        shlwdza[9] = 0.02;
+//        shlwdza[10] = 0.02;
+//        shlwdza[11] = thickness-0.22;
+//        shlwnum = 12;
+//    } else if (thickness <= 0.26) {
+//        shlwdza[0] = 0.02;
+//        shlwdza[1] = 0.02;
+//        shlwdza[2] = 0.02;
+//        shlwdza[3] = 0.02;
+//        shlwdza[4] = 0.02;
+//        shlwdza[5] = 0.02;
+//        shlwdza[6] = 0.02;
+//        shlwdza[7] = 0.02;
+//        shlwdza[8] = 0.02;
+//        shlwdza[9] = 0.02;
+//        shlwdza[10] = 0.02;
+//        shlwdza[11] = 0.02;
+//        shlwdza[12] = thickness-0.24;
+//        shlwnum = 13;
+//    } else if (thickness <= 0.28) {
+//        shlwdza[0] = 0.02;
+//        shlwdza[1] = 0.02;
+//        shlwdza[2] = 0.02;
+//        shlwdza[3] = 0.02;
+//        shlwdza[4] = 0.02;
+//        shlwdza[5] = 0.02;
+//        shlwdza[6] = 0.02;
+//        shlwdza[7] = 0.02;
+//        shlwdza[8] = 0.02;
+//        shlwdza[9] = 0.02;
+//        shlwdza[10] = 0.02;
+//        shlwdza[11] = 0.02;
+//        shlwdza[12] = 0.02;
+//        shlwdza[13] = thickness-0.26;
+//        shlwnum = 14;
+//    }  else if (thickness <= 0.30) {
+//        shlwdza[0] = 0.02;
+//        shlwdza[1] = 0.02;
+//        shlwdza[2] = 0.02;
+//        shlwdza[3] = 0.02;
+//        shlwdza[4] = 0.02;
+//        shlwdza[5] = 0.02;
+//        shlwdza[6] = 0.02;
+//        shlwdza[7] = 0.02;
+//        shlwdza[8] = 0.02;
+//        shlwdza[9] = 0.02;
+//        shlwdza[10] = 0.02;
+//        shlwdza[11] = 0.02;
+//        shlwdza[12] = 0.02;
+//        shlwdza[13] = 0.02;
+//        shlwdza[14] = thickness-0.28;
+//        shlwnum = 15;
+//    } else if (thickness <= 0.32) {
+//        shlwdza[0] = 0.02;
+//        shlwdza[1] = 0.02;
+//        shlwdza[2] = 0.02;
+//        shlwdza[3] = 0.02;
+//        shlwdza[4] = 0.02;
+//        shlwdza[5] = 0.02;
+//        shlwdza[6] = 0.02;
+//        shlwdza[7] = 0.02;
+//        shlwdza[8] = 0.02;
+//        shlwdza[9] = 0.02;
+//        shlwdza[10] = 0.02;
+//        shlwdza[11] = 0.02;
+//        shlwdza[12] = 0.02;
+//        shlwdza[13] = 0.02;
+//        shlwdza[14] = 0.02;
+//        shlwdza[15] = thickness-0.30;
+//        shlwnum = 16;
+//    } else if (thickness <= 0.34) {
+//        shlwdza[0] = 0.02;
+//        shlwdza[1] = 0.02;
+//        shlwdza[2] = 0.02;
+//        shlwdza[3] = 0.02;
+//        shlwdza[4] = 0.02;
+//        shlwdza[5] = 0.02;
+//        shlwdza[6] = 0.02;
+//        shlwdza[7] = 0.02;
+//        shlwdza[8] = 0.02;
+//        shlwdza[9] = 0.02;
+//        shlwdza[10] = 0.02;
+//        shlwdza[11] = 0.02;
+//        shlwdza[12] = 0.02;
+//        shlwdza[13] = 0.02;
+//        shlwdza[14] = 0.02;
+//        shlwdza[15] = 0.02;
+//        shlwdza[16] = thickness-0.32;
+//        shlwnum = 17;
+//    } else if (thickness <= 0.36) {
+//        shlwdza[0] = 0.02;
+//        shlwdza[1] = 0.02;
+//        shlwdza[2] = 0.02;
+//        shlwdza[3] = 0.02;
+//        shlwdza[4] = 0.02;
+//        shlwdza[5] = 0.02;
+//        shlwdza[6] = 0.02;
+//        shlwdza[7] = 0.02;
+//        shlwdza[8] = 0.02;
+//        shlwdza[9] = 0.02;
+//        shlwdza[10] = 0.02;
+//        shlwdza[11] = 0.02;
+//        shlwdza[12] = 0.02;
+//        shlwdza[13] = 0.02;
+//        shlwdza[14] = 0.02;
+//        shlwdza[15] = 0.02;
+//        shlwdza[16] = 0.02;
+//        shlwdza[17] = thickness-0.34;
+//        shlwnum = 18;
+//    } else if (thickness <= 0.38) {
+//        shlwdza[0] = 0.02;
+//        shlwdza[1] = 0.02;
+//        shlwdza[2] = 0.02;
+//        shlwdza[3] = 0.02;
+//        shlwdza[4] = 0.02;
+//        shlwdza[5] = 0.02;
+//        shlwdza[6] = 0.02;
+//        shlwdza[7] = 0.02;
+//        shlwdza[8] = 0.02;
+//        shlwdza[9] = 0.02;
+//        shlwdza[10] = 0.02;
+//        shlwdza[11] = 0.02;
+//        shlwdza[12] = 0.02;
+//        shlwdza[13] = 0.02;
+//        shlwdza[14] = 0.02;
+//        shlwdza[15] = 0.02;
+//        shlwdza[16] = 0.02;
+//        shlwdza[17] = 0.02;
+//        shlwdza[18] = thickness-0.36;
+//        shlwnum = 19;
+//    } else if (thickness <= 0.40) {
+//        shlwdza[0] = 0.02;
+//        shlwdza[1] = 0.02;
+//        shlwdza[2] = 0.02;
+//        shlwdza[3] = 0.02;
+//        shlwdza[4] = 0.02;
+//        shlwdza[5] = 0.02;
+//        shlwdza[6] = 0.02;
+//        shlwdza[7] = 0.02;
+//        shlwdza[8] = 0.02;
+//        shlwdza[9] = 0.02;
+//        shlwdza[10] = 0.02;
+//        shlwdza[11] = 0.02;
+//        shlwdza[12] = 0.02;
+//        shlwdza[13] = 0.02;
+//        shlwdza[14] = 0.02;
+//        shlwdza[15] = 0.02;
+//        shlwdza[16] = 0.02;
+//        shlwdza[17] = 0.02;
+//        shlwdza[18] = 0.02;
+//        shlwdza[19] = thickness-0.38;
+//        shlwnum = 20;
+//    
+//    } else if (thickness > 0.4) {
+//        
+//        shlwdza[0] = 0.02;
+//        shlwdza[1] = 0.02;
+//        shlwdza[2] = 0.02;
+//        shlwdza[3] = 0.02;
+//        shlwdza[4] = 0.02;
+//        shlwdza[5] = 0.02;
+//        shlwdza[6] = 0.02;
+//        shlwdza[7] = 0.02;
+//        shlwdza[8] = 0.02;
+//        shlwdza[9] = 0.02;
+//        shlwdza[10] = 0.02;
+//        shlwdza[11] = 0.02;
+//        shlwdza[12] = 0.02;
+//        shlwdza[13] = 0.02;
+//        shlwdza[14] = 0.02;
+//        shlwdza[15] = 0.02;
+//        shlwdza[16] = 0.02;
+//        shlwdza[17] = 0.02;
+//        shlwdza[18] = 0.02;
+//        shlwdza[19] = thickness-0.38;
+//        shlwnum = 20;
+//        
+//	}
 	shlwthick = thickness;
 	dlstshlw = shlwdza[shlwnum - 1];
 }

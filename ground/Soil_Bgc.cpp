@@ -40,8 +40,7 @@ void Soil_Bgc::updateDeepThickness(Layer* fstdeepl, Layer* lstdeepl) {
 				pl = dynamic_cast<PeatLayer*> (sl);
 				if (pl->isHumic) {
 					cumcarbonbot = cumcarbontop + sl->reac + sl->nonc;
-					dbmbot = pow((cumcarbonbot / 10000.) / bgcpar.deepa, 1.
-							/ bgcpar.deepb) / 100.;
+					dbmbot = pow((cumcarbonbot / 10000.) / bgcpar.deepa, 1./ bgcpar.deepb) / 100.;
 					tempdz = dbmbot - dbmtop;
 					dbmtop = dbmbot;
 					cumcarbontop = cumcarbonbot;
@@ -1093,12 +1092,9 @@ void Soil_Bgc::deltastate() {
 		// and the rest are released as CO2
 		double residuetoco2 = (double) bgcpar.som2co2;
 
-		del_sois.reac[il] = blwfrac * del_v2soi.ltrfalc * blwlfcfrac[il]
-				+ abvfrac * del_v2soi.ltrfalc * abvlfcfrac[il]
-				- del_soi2a.rrh[il] * (1.0 + residuetoco2); //
+		del_sois.reac[il] = blwfrac * del_v2soi.ltrfalc * blwlfcfrac[il]+ abvfrac * del_v2soi.ltrfalc * abvlfcfrac[il]- del_soi2a.rrh[il] * (1.0 + residuetoco2); //
 
-		del_sois.nonc[il] = del_soi2a.rrh[il] * residuetoco2
-				- del_soi2a.nrh[il];
+		del_sois.nonc[il] = del_soi2a.rrh[il] * residuetoco2 - del_soi2a.nrh[il];
 	}
 
 	for (int il = 0; il < numsl; il++) {
