@@ -504,8 +504,309 @@ void Stefan::updateTemps(const double & tdrv, Layer *frontl, Layer *backl,
 
 	}
 
+#ifdef SOITDATA
+    
+    Layer* currl = frontl;
+    double tmp1, temp50, deptharray[5], inter_temp;
+    
+    if ((year == 2009 && doy >= 141) || year == 2010 || year == 2011 || year ==2012 || year == 2013 || (year == 2014 && doy <= 186)) {
+        
+        while (currl != NULL) {
+            if (currl->isSoil()) {
+                
+                tmp1 = currl->dz / 2.0 + currl->z;
+                
+                if (tmp1 >= 0.5) {
+                    if (year == 2009)
+                        temp50 = temp2009[doy - 141][4];
+                    if (year == 2010)
+                        temp50 = temp2010[doy][4];
+                    if (year == 2011)
+                        temp50 = temp2011[doy][4];
+                    if (year == 2012)
+                        temp50 = temp2012[doy][4];
+                    if (year == 2013)
+                        temp50 = temp2013[doy][4];
+                    if (year == 2014)
+                        temp50 = temp2014[doy][4];
+                    
+                    
+                    currl->tem = temp50;
+                    
+                } else {
+                    
+                    if (year == 2009) {
+                        deptharray[0] = temp2009[doy - 141][0];
+                        deptharray[1] = temp2009[doy - 141][1];
+                        deptharray[2] = temp2009[doy - 141][2];
+                        deptharray[3] = temp2009[doy - 141][3];
+                        deptharray[4] = temp2009[doy - 141][4];
+                    }
+                    
+                    if (year == 2010) {
+                        deptharray[0] = temp2010[doy][0];
+                        deptharray[1] = temp2010[doy][1];
+                        deptharray[2] = temp2010[doy][2];
+                        deptharray[3] = temp2010[doy][3];
+                        deptharray[4] = temp2010[doy][4];
+                    }
+                    if (year == 2011) {
+                        deptharray[0] = temp2011[doy][0];
+                        deptharray[1] = temp2011[doy][1];
+                        deptharray[2] = temp2011[doy][2];
+                        deptharray[3] = temp2011[doy][3];
+                        deptharray[4] = temp2011[doy][4];
+                    }
+                    
+                    if (year == 2012) {
+                        deptharray[0] = temp2012[doy][0];
+                        deptharray[1] = temp2012[doy][1];
+                        deptharray[2] = temp2012[doy][2];
+                        deptharray[3] = temp2012[doy][3];
+                        deptharray[4] = temp2012[doy][4];
+                    }
+                    
+                    if (year == 2013) {
+                        deptharray[0] = temp2013[doy][0];
+                        deptharray[1] = temp2013[doy][1];
+                        deptharray[2] = temp2013[doy][2];
+                        deptharray[3] = temp2013[doy][3];
+                        deptharray[4] = temp2013[doy][4];
+                    }
+                    
+                    
+                    
+                    
+                    if (year == 2014) {
+                        deptharray[0] = temp2014[doy][0];
+                        deptharray[1] = temp2014[doy][1];
+                        deptharray[2] = temp2014[doy][2];
+                        deptharray[3] = temp2014[doy][3];
+                        deptharray[4] = temp2014[doy][4];
+                    }
+                    
+                    
+                    inter_temp = linear_interp(soildepth, deptharray, 0, 4, tmp1);
+                    currl->tem = inter_temp;
+                }
+            }
+            currl = currl->nextl;
+        }
+    }
+    
+#endif //SOITDATA
+    
+#ifdef SOITDATAGAMMA
+    
+    Layer* currl = frontl;
+    double tmp1, tempgamma50, deptharray[7], inter_tempgamma;
+    
+    if ((year == 2009 && doy >= 255) || year == 2010 || year == 2011 || year ==2012 || year == 2013 || (year == 2014 && doy <= 186)) {
+        
+        while (currl != NULL) {
+            if (currl->isSoil()) {
+                
+                tmp1 = currl->dz / 2.0 + currl->z;
+                
+                if (tmp1 >= 2.0) {
+                    if (year == 2009)
+                        tempgamma50 = tempgamma2009[doy - 255][6];
+                    if (year == 2010)
+                        tempgamma50 = tempgamma2010[doy][6];
+                    if (year == 2011)
+                        tempgamma50 = tempgamma2011[doy][6];
+                    if (year == 2012)
+                        tempgamma50 = tempgamma2012[doy][6];
+                    if (year == 2013)
+                        tempgamma50 = tempgamma2013[doy][6];
+                    if (year == 2014)
+                        tempgamma50 = tempgamma2014[doy][6];
+                    
+                    
+                    currl->tem = tempgamma50;
+                    
+                } else {
+                    
+                    if (year == 2009) {
+                        deptharray[0] = tempgamma2009[doy - 141][0];
+                        deptharray[1] = tempgamma2009[doy - 141][1];
+                        deptharray[2] = tempgamma2009[doy - 141][2];
+                        deptharray[3] = tempgamma2009[doy - 141][3];
+                        deptharray[4] = tempgamma2009[doy - 141][4];
+                        deptharray[5] = tempgamma2009[doy - 141][5];
+                        deptharray[6] = tempgamma2009[doy - 141][6];
+                    }
+                    
+                    if (year == 2010) {
+                        deptharray[0] = tempgamma2010[doy][0];
+                        deptharray[1] = tempgamma2010[doy][1];
+                        deptharray[2] = tempgamma2010[doy][2];
+                        deptharray[3] = tempgamma2010[doy][3];
+                        deptharray[4] = tempgamma2010[doy][4];
+                        deptharray[5] = tempgamma2010[doy][5];
+                        deptharray[6] = tempgamma2010[doy][6];
+                    }
+                    if (year == 2011) {
+                        deptharray[0] = tempgamma2011[doy][0];
+                        deptharray[1] = tempgamma2011[doy][1];
+                        deptharray[2] = tempgamma2011[doy][2];
+                        deptharray[3] = tempgamma2011[doy][3];
+                        deptharray[4] = tempgamma2011[doy][4];
+                        deptharray[5] = tempgamma2011[doy][5];
+                        deptharray[6] = tempgamma2011[doy][6];
+                    }
+                    
+                    if (year == 2012) {
+                        deptharray[0] = tempgamma2012[doy][0];
+                        deptharray[1] = tempgamma2012[doy][1];
+                        deptharray[2] = tempgamma2012[doy][2];
+                        deptharray[3] = tempgamma2012[doy][3];
+                        deptharray[4] = tempgamma2012[doy][4];
+                        deptharray[5] = tempgamma2012[doy][5];
+                        deptharray[6] = tempgamma2012[doy][6];
+                    }
+                    
+                    if (year == 2013) {
+                        deptharray[0] = tempgamma2013[doy][0];
+                        deptharray[1] = tempgamma2013[doy][1];
+                        deptharray[2] = tempgamma2013[doy][2];
+                        deptharray[3] = tempgamma2013[doy][3];
+                        deptharray[4] = tempgamma2013[doy][4];
+                        deptharray[5] = tempgamma2013[doy][5];
+                        deptharray[6] = tempgamma2013[doy][6];
+                    }
+                    
+                    
+                    
+                    
+                    if (year == 2014) {
+                        deptharray[0] = tempgamma2014[doy][0];
+                        deptharray[1] = tempgamma2014[doy][1];
+                        deptharray[2] = tempgamma2014[doy][2];
+                        deptharray[3] = tempgamma2014[doy][3];
+                        deptharray[4] = tempgamma2014[doy][4];
+                        deptharray[5] = tempgamma2014[doy][5];
+                        deptharray[6] = tempgamma2014[doy][6];
+                    }
+                    
+                    
+                    inter_tempgamma = linear_interp(soildepthgamma, deptharray, 0, 6, tmp1);
+                    currl->tem = inter_tempgamma;
+                }
+            }
+            currl = currl->nextl;
+        }
+    }
+    
+#endif //SOITDATAGAMMA
+    
+#ifdef SOITDATABETASE
+    
+    Layer* currl = frontl;
+    double tmp1, tempbetase50, deptharray[7], inter_tempbetase;
+    
+    if ((year == 2009 && doy >= 272) || year == 2010 || year == 2011 || year ==2012 || (year == 2013&& doy <= 180) || (year == 2014 && doy <= 186)) {
+        
+        while (currl != NULL) {
+            if (currl->isSoil()) {
+                
+                tmp1 = currl->dz / 2.0 + currl->z;
+                
+                if (tmp1 >= 1.7) {
+                    if (year == 2009)
+                        tempbetase50 = tempbetase2009[doy - 272][6];
+                    if (year == 2010)
+                        tempbetase50 = tempbetase2010[doy][6];
+                    if (year == 2011)
+                        tempbetase50 = tempbetase2011[doy][6];
+                    if (year == 2012)
+                        tempbetase50 = tempbetase2012[doy][6];
+                    if (year == 2013)
+                        tempbetase50 = tempbetase2013[doy][6];
+                    if (year == 2014)
+                        tempbetase50 = tempbetase2014[doy][6];
+                    
+                    
+                    currl->tem = tempbetase50;
+                    
+                } else {
+                    
+                    if (year == 2009) {
+                        deptharray[0] = tempbetase2009[doy - 141][0];
+                        deptharray[1] = tempbetase2009[doy - 141][1];
+                        deptharray[2] = tempbetase2009[doy - 141][2];
+                        deptharray[3] = tempbetase2009[doy - 141][3];
+                        deptharray[4] = tempbetase2009[doy - 141][4];
+                        deptharray[5] = tempbetase2009[doy - 141][5];
+                        deptharray[6] = tempbetase2009[doy - 141][6];
+                    }
+                    
+                    if (year == 2010) {
+                        deptharray[0] = tempbetase2010[doy][0];
+                        deptharray[1] = tempbetase2010[doy][1];
+                        deptharray[2] = tempbetase2010[doy][2];
+                        deptharray[3] = tempbetase2010[doy][3];
+                        deptharray[4] = tempbetase2010[doy][4];
+                        deptharray[5] = tempbetase2010[doy][5];
+                        deptharray[6] = tempbetase2010[doy][6];
+                    }
+                    if (year == 2011) {
+                        deptharray[0] = tempbetase2011[doy][0];
+                        deptharray[1] = tempbetase2011[doy][1];
+                        deptharray[2] = tempbetase2011[doy][2];
+                        deptharray[3] = tempbetase2011[doy][3];
+                        deptharray[4] = tempbetase2011[doy][4];
+                        deptharray[5] = tempbetase2011[doy][5];
+                        deptharray[6] = tempbetase2011[doy][6];
+                    }
+                    
+                    if (year == 2012) {
+                        deptharray[0] = tempbetase2012[doy][0];
+                        deptharray[1] = tempbetase2012[doy][1];
+                        deptharray[2] = tempbetase2012[doy][2];
+                        deptharray[3] = tempbetase2012[doy][3];
+                        deptharray[4] = tempbetase2012[doy][4];
+                        deptharray[5] = tempbetase2012[doy][5];
+                        deptharray[6] = tempbetase2012[doy][6];
+                    }
+                    
+                    if (year == 2013) {
+                        deptharray[0] = tempbetase2013[doy][0];
+                        deptharray[1] = tempbetase2013[doy][1];
+                        deptharray[2] = tempbetase2013[doy][2];
+                        deptharray[3] = tempbetase2013[doy][3];
+                        deptharray[4] = tempbetase2013[doy][4];
+                        deptharray[5] = tempbetase2013[doy][5];
+                        deptharray[6] = tempbetase2013[doy][6];
+                    }
+                    
+                    
+                    
+                    
+                    if (year == 2014) {
+                        deptharray[0] = tempbetase2014[doy][0];
+                        deptharray[1] = tempbetase2014[doy][1];
+                        deptharray[2] = tempbetase2014[doy][2];
+                        deptharray[3] = tempbetase2014[doy][3];
+                        deptharray[4] = tempbetase2014[doy][4];
+                        deptharray[5] = tempbetase2014[doy][5];
+                        deptharray[6] = tempbetase2014[doy][6];
+                    }
+                    
+                    
+                    inter_tempbetase = linear_interp(soildepthbetase, deptharray, 0, 6, tmp1);
+                    currl->tem = inter_tempbetase;
+                }
+            }
+            currl = currl->nextl;
+        }
+    }
+    
+#endif //SOITDATABETASE
+    
+    
 	///////////////////////////////////////////////////////
-#ifndef CONTROL
+/*#ifndef CONTROL
 	Layer* currl = frontl;
 	double tmp1, temp50, deptharray[5], inter_temp;
 #ifndef RAISED
@@ -640,6 +941,7 @@ void Stefan::updateTemps(const double & tdrv, Layer *frontl, Layer *backl,
 		}
 	}
 #endif
+  */      
 
 }
 
