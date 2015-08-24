@@ -3,7 +3,7 @@
  */
  #include "Layer.h"
  
-Layer::Layer(){
+ Layer::Layer(){
  	nextl= NULL;
  	prevl= NULL;
  	
@@ -11,7 +11,8 @@ Layer::Layer(){
  	tem =-999.;
     frozen =0;
     dbdw = 1.;
-    age =0.;    
+    age =0.;
+    
 };
  
 Layer::~Layer(){

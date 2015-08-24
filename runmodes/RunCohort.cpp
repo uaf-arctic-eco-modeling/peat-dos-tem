@@ -456,19 +456,22 @@ void RunCohort::runEquilibrium() {
 //	int nfri = min((int) (MAX_EQ_YR / cht.fd->gd->fri), 20); //max. 10000 yr or 20 FRI
 
     
-//    cout<<MAX_EQ_YR<<"\t"<<cht.fd->gd->fri<<"\t"<<nfri<<endl;
+
     
     
 //	for (int iy = 0; iy < (nfri + 1) * cht.fd->gd->fri - 2; iy++) { //Yuan: -2 will make the final restart.nc not the fire year, but two years ago
-	for (int iy = 0; iy < 1000 - 2; iy++) {
+	for (int iy = 0; iy < 1500 - 2; iy++) {
 		int yrcnt = iy;
 		for (int im = 0; im < 12; im++) {
 			int currmind = im;
 			int dinmcurr = cht.timer->getDaysInMonth(im);
-			;
-			cht.updateMonthly(outputyrind, yrcnt, currmind, dinmcurr, false,
-					false);
+			
+            
+            
+			cht.updateMonthly(outputyrind, yrcnt, currmind, dinmcurr, false,false);
 
+            
+            
 			if (SITEMODE) {
 				siteoutput(outputyrind, currmind);
 			}

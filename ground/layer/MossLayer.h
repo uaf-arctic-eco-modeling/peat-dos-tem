@@ -14,10 +14,13 @@ class MossLayer: public SoilLayer{
 	 MossLayer(const double &pdz, const int & sphagnum);
 	 
 	 /*fraction of live moss*/
-    double fraclive;
+	 double fraclive;
+
     int sphagnum;  //=1 sphagnum, 0= feathermoss
     virtual bool isMoss();
     virtual bool isMineral();
     virtual bool isPeat();
+    
+   
 };
 #endif /*MOSSLAYER_H_*/

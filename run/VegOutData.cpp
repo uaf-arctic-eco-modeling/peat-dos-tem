@@ -7,10 +7,16 @@
 VegOutData::VegOutData() {
 
 	for (int id=0; id<DYINY; id++){
-		sinterd[id]=-999;
-		rinterd[id]=-999;
-		sthfld[id]=-999;
-		rthfld[id]=-999;
+//		sinterd[id]=-999;
+//		rinterd[id]=-999;
+//        sthfld[id]=-999;
+ //       rthfld[id]=-999;
+        
+        sinter[id]=-999; //Y.Mi
+        rinter[id]=-999;
+        sthfl[id]=-999;
+		rthfl[id]=-999;
+        
 		sdripd[id]=-999;
 		rdripd[id]=-999;
 		scanopyd[id]=-999;
@@ -36,10 +42,10 @@ VegOutData::VegOutData() {
 		trans[im]=-999;			 
    		vevap[im]=-999;
    		vsubl[im]=-999;		
-   		rinter[im]=-999;
-   		sinter[im]=-999;
-   		rthfl[im]=-999;
-   		sthfl[im]=-999;					   	   	
+//   		rinter[im]=-999;
+//   		sinter[im]=-999;
+//   		rthfl[im]=-999;
+//   		sthfl[im]=-999;
    		radthfl[im]=-999;	  		
 		vegc[im]=-999;    
 		strn[im]=-999;

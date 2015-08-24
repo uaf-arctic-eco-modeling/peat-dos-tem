@@ -145,13 +145,18 @@ double SoilLayer::getFrozenFraction(){
 	// get frozen layer specific heat capcity
 	 double SoilLayer::getFrzVolHeatCapa(){
 //	   double vhc = vhcsolid * (1-poro) + (liq+ice)/dz *SHCICE;
-	   double vhc = vhcsolid * (1-poro) + poro*(liq+ice)/dz *SHCICE;	//Yuan: bug here??
-	 	return vhc;
+	   double vhc = vhcsolid   + ice *SHCICE/dz  + liq *SHCLIQ/dz;	//Yuan: bug here??//Y.Mi, the heat capacity unit of the first part is J m-3, while the second part is J kg-1
+	 	
+//         cout << vhc<<"f" <<endl;
+         
+         return vhc;
 	 };
 
 	 double SoilLayer::getUnfVolHeatCapa(){
 //	   double vhc= vhcsolid * (1-poro) + (liq+ice)/dz *SHCLIQ;
-	   double vhc = vhcsolid * (1-poro) + poro*(liq+ice)/dz *SHCLIQ;	//Yuan: bug here??
+	   double vhc = vhcsolid  + liq *SHCLIQ/dz ;	//Yuan: bug here??
+         
+//         cout << vhc<<endl;
 	 	return vhc;
 	 };	    
 	   
@@ -163,19 +168,26 @@ double SoilLayer::getFrozenFraction(){
 	  double vliq = getVolLiq();
 	  double s = (vice + vliq)/poro;
 	  s = min((double)s, 1.0);
-          
 	  double ke= s; // for frozen case
 	  if(s < 1.e-7){
-	  	 tc = tcdry;
-          
+          tc = tcdry;
 	  }else{
-
-          if(isMineral()||isRock())
-          tc = ke *tcsatfrz + (1-ke)*tcdry;
+          
+          if (isMoss()) {
+              tc = tcsolid;
+          }
+          
+           if (isMineral()) {
+	  	 //tc = ke *tcsatfrz + (1-ke)*tcdry;
+              tc = ke *tcsatfrz + (1-ke)*tcsolid;
+          }
+          
+          else {
+             // tc = tcdry * pow(tcsatfrz/tcdry, s); //Y.Mi
+              tc = tcsolid* pow(tcsatfrz/tcsolid, s);
               
-          else
-          tc = tcdry * pow(tcsatfrz/tcdry, ke); //Y.Mi, Dec. 2014
-
+             
+          }
 	  }
   	//	tc = max(tc, mintc);
 	  
@@ -189,18 +201,29 @@ double SoilLayer::getUnfThermCond(){
   	double vliq = getVolLiq();
   	double s = (vice + vliq)/poro;
   	s = min(s, 1.0);
-    
-    
   	double ke= log(s) +1; // for unfrozen case
   	ke = max(ke, 0.);
   	if(s < 1.e-7){
-	  	 tc = tcdry;	
+	  	 tc = tcdry;
   	}else{
-	  	
-        if(isMineral()||isRock())
-            tc = ke *tcsatunf + (1-ke)*tcdry;
-        else
-        tc = (tcsatunf-tcdry)*ke*ke+tcdry; //Y.Mi, Dec. 2014
+        
+        if (isMoss()) {
+            tc = tcsolid;
+        }
+        
+        if (isMineral()) {
+           
+           // tc = ke *tcsatunf + (1-ke)*tcdry;
+            tc = ke *tcsatunf + (1-ke)*tcsolid;
+            
+        }
+        
+        else {
+         // tc = (tcsatunf-tcdry)* s * s + tcdry; //Y.Mi
+            tc =  tcsolid+(tcsatunf-tcsolid)* s * s;
+        }
+            
+	  	 
   	}
 	  	//if(tc<tcmin){
 	  	 //cout <<"tc is less " <<tc <<"\n";
@@ -383,9 +406,11 @@ void SoilLayer::deriveProperty(){
 	 tcsatfrz= pow((double)tcsolid ,(double) 1- poro) * pow((double)TCICE, (double)poro);
 	 tcdry = pow((double) tcsolid , (double) 1- poro) * pow((double)TCAIR, (double) poro);
 	// tcdry = 0.05;// getDryThermCond(tcsolid, bulkden, prtlden);
-	 
-   	 minliq = 0.05 * 1000. *dz;
-   	  //minliq = 0.05 * poro * 1000. *dz;
+	
+   
+    
+   	// minliq = 0.05 * 1000. *dz;
+   	  minliq = 0.05 * poro * 1000. *dz;
    	 maxliq = poro*1000.*dz;
    //	 maxice =poro*917*dz -minliq;
    	 maxice =poro*1000*dz -minliq;

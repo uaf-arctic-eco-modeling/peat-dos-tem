@@ -140,7 +140,7 @@ int main(int argc, char* argv[]) {
 				mfile<<"config/"<<endl;
 				mfile<<"tr"<<endl;
 				mfile<<"restart"<<endl;
-				mfile<<"dynamic"<<endl; //climate, dynamic or normal
+				mfile<<"normal"<<endl; //climate, dynamic or normal
 				mfile<<"dynamic"<<endl; //CO2, dynamic or initial
 				mfile<<"Test-TEM-GUI"<<endl;
 				mfile.close();

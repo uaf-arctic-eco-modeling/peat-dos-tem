@@ -7,17 +7,15 @@
 
 MossLayer::MossLayer(const double &pdz, const int & sphagnum){
 	tkey=I_MOSS;
-    dz = pdz;
+
+	dz = pdz;
 
 // these properties will not change upon fire disturbance
 // it is assumed that when fire occurs, the left moss will
 // be converted to deep organic type
-    
     tcsolid = 0.25;
-//	prtlden = 1.3e3 ; // kg/m3, from ATBalland22005a
-	prtlden = 1.51e3 ; //Y.Mi, data from Kristen
-    
-    
+    prtlden = 1.51;// Y.Mi 1.3e3 ; // kg/m3, from ATBalland22005a
+	 
 	fldcap = 0.516; // reference ? unit vwater/vtot ? // not used
 	wltpnt = 0.321; // reference   // not used
 	color = 3;// ATBeringer52001a;
@@ -26,11 +24,8 @@ MossLayer::MossLayer(const double &pdz, const int & sphagnum){
    	albdryvis = 0.2; 
    	albdrynir = 0.4;
   
-  // 	bulkden = 25000; // g/m3
-  //  bulkden = 5100;
-    // 	cfrac = 43.7; // %
-    bulkden = 15000; //Y.Mi, data from Kristen, kg/m3
-    cfrac = 43.08; // Y.Mi, data from Kristen
+   	bulkden = 15;//25000; // g/m3 Y.MI
+   	cfrac = 43.7; // %
    	
    	if(sphagnum ==1){
    	hksat = 0.15; //mm/s
@@ -59,12 +54,10 @@ MossLayer::MossLayer(const double &pdz, const int & sphagnum){
    	albdrynir = 0.36; */
    	
    	
-   	vhcsolid=2.3e6; //J/m3K
-    
+   	vhcsolid=2.5e6; //J/m3K
 // the porosity might be changed with depth
     //bulkden = 0.03 e3 ; // kg/m3, from ATYoshikawa32004a
-	//poro = 0.98;
-    poro = 0.99; //Y.Mi, data from Kristen
+    poro = 0.88;//0.98;
 	//tcmin =0.01; //0.1;
 	
   //  tcmin =0.04;	

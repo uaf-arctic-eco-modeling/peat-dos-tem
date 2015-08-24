@@ -5,17 +5,20 @@
 
 	const float DENLIQ = 1000.; // liquid water density kg/m2
 	const float DENICE = 917. ; // ice density kg/m2
-	const float TCLIQ  = 0.6  ; //  thermal conductivity of liq W/mK
-	const float TCICE  = 2.29 ; //  thermal conductivity of ice W/mK
-	const float TCAIR  = 0.023 ; // thermal conductivity of air W/mK
+const float DENAIR = 1.27 ; // ice density kg/m2
+
+const float TCLIQ  = 0.56;//0.6; //  thermal conductivity of liq W/mK
+const float TCICE  = 2.24;//2.29 ; //  thermal conductivity of ice W/mK
+    const float TCAIR  = 0.025 ; // thermal conductivity of air W/mK
 	
 	const float SHCLIQ = 4.188e3  ; //  specific heat capacity of liq J/kgK
 	const float SHCICE = 2.11727e3 ; //  specific heat capacity of ice J/kgK
-	const float SHCAIR = 1.00464e3 ; // specific heat capacity of air J/kgK
+    const float SHCAIR = 1.212e3 ; // specific heat capacity of air J/kgK
+ const float SHCSNOW = 2.09e3 ; // specific heat capacity of snow J/kgK
 	
-	const float LHFUS  = 3.337e5 ; // latent heat of fusion  J/kg
-	const float LHVAP  = 2.501e6 ; // latent heat of vaporization  J/kg
-	const float LHSUB  = 2.8338e6 ; // latent heat of sublimation  J/kg
+    const float LHFUS  = 3.337e5;//3.337e5 ; // latent heat of fusion  J/kg
+const float LHVAP  = 2.501e6 ; // latent heat of vaporization  J/kg
+const float LHSUB  = 2.8338e6 ; // latent heat of sublimation  J/kg
 	
 	const float G        = 9.80616 ;  //  acceleration of gravity m/s2
 	const float PI       = 3.14159265358979; // pi -

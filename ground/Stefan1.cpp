@@ -15,11 +15,10 @@ Stefan::~Stefan() {
 }
 ;
 
-void Stefan::updateFronts(const double & tdrv, Layer *frontl, Layer *backl,
-		Layer *fstsoill, Layer* lstminl, const int & mind) {
+void Stefan::updateFronts(const double & tdrv, Layer *frontl, Layer *backl,Layer *fstsoill, Layer* lstminl, const int & mind) {
 	for (int i = 0; i < backl->indl; i++) {
 		temupdated[i] = false;
-		;
+		
 		temold[i] = -999.;
 	}
 
@@ -70,8 +69,7 @@ void Stefan::updateFronts(const double & tdrv, Layer *frontl, Layer *backl,
 		} else if (currl->isSoil()) {
 			sl = dynamic_cast<SoilLayer*> (currl);
 			sl->checkFronts();
-			processSoilLayer5Top(frozenstate, tkres, tkfront, dse, sumresabv,
-					tdrv0, sl, frontl, backl);
+			processSoilLayer5Top(frozenstate, tkres, tkfront, dse, sumresabv,tdrv0, sl, frontl, backl);
 			sl->checkFronts();
 			sl->updateWater5Front();
 
@@ -151,8 +149,7 @@ void Stefan::updateFronts(const double & tdrv, Layer *frontl, Layer *backl,
 				sumresblw += prevl->dz / tkres;
 			} else if (prevl->isSoil()) {
 				SoilLayer* psl = dynamic_cast<SoilLayer*> (prevl);
-				processSoilLayer5Bot(frozenstate, tkres, tkfront, dse,
-						sumresblw, tdrv1, psl, frontl, backl);
+				processSoilLayer5Bot(frozenstate, tkres, tkfront, dse,sumresblw, tdrv1, psl, frontl, backl);
 			} else if (prevl->isSnow()) {
 				break;
 			}
@@ -166,8 +163,7 @@ void Stefan::updateFronts(const double & tdrv, Layer *frontl, Layer *backl,
 }
 ;
 
-void Stefan::processSnowLayer(double const & tkres, double const & tkfront,
-		double & dse, double & sumresabv, const double & tdrv, Layer* currl) {
+void Stefan::processSnowLayer(double const & tkres, double const & tkfront,double & dse, double & sumresabv, const double & tdrv, Layer* currl) {
 	SnowLayer* sl; // check to see whether the dse can totally melt a snow layer
 	sl = dynamic_cast<SnowLayer*> (currl);
 	double dz = sl->dz;
@@ -191,9 +187,7 @@ void Stefan::processSnowLayer(double const & tkres, double const & tkfront,
 
 }
 
-void Stefan::processSoilLayer5Top(const int &frozenstate, double const & tkres,
-		double const & tkfront, double & dse, double & sumresabv,
-		const double & tdrv, SoilLayer* sl, Layer *frontl, Layer *backl) {
+void Stefan::processSoilLayer5Top(const int &frozenstate, double const & tkres,double const & tkfront, double & dse, double & sumresabv,const double & tdrv, SoilLayer* sl, Layer *frontl, Layer *backl) {
 	//only deal with the front(s) in one layer
 
 	//create sublayer, based on the number of fronts in this layer
@@ -209,8 +203,7 @@ void Stefan::processSoilLayer5Top(const int &frozenstate, double const & tkres,
 
 	//first step is to create fronts at  the top of a layer
 	if (numfnt > 0) {
-		if ((sl->fronts[0]->frzing == 1 && tdrv > 0) or (sl->fronts[0]->frzing
-				== -1 && tdrv < 0)) {
+		if ((sl->fronts[0]->frzing == 1 && tdrv > 0) or (sl->fronts[0]->frzing == -1 && tdrv < 0)) {
 			// in this way, the first front will be always freezing when tdrv<0
 			sl->addOneFront5Top(0., -sl->fronts[0]->frzing);
 		}
@@ -323,8 +316,7 @@ void Stefan::processSoilLayer5Bot(const int &frozenstate, double const & tkres,
 	int numfnt = sl->fronts.size();
 
 	if (numfnt > 0) {
-		if ((sl->fronts[numfnt - 1]->frzing == 1 && tdrv < 0)
-				or (sl->fronts[numfnt - 1]->frzing == -1 && tdrv > 0)) {
+		if ((sl->fronts[numfnt - 1]->frzing == 1 && tdrv < 0)or (sl->fronts[numfnt - 1]->frzing == -1 && tdrv > 0)) {
 			// there should be no new front created from bottom;
 
 			string msg = "there should be no new front created from bottom 1";
@@ -411,8 +403,7 @@ void Stefan::processSoilLayer5Bot(const int &frozenstate, double const & tkres,
 	}
 }
 
-double Stefan::getDegSecNeeded(const double & dz, const double & volwat,
-		const double & tk, const double & sumresabv) {
+double Stefan::getDegSecNeeded(const double & dz, const double & volwat,const double & tk, const double & sumresabv) {
 	/*input
 	 * 	   dz: the thickness of  fraction of (or whole)  soil layer:
 	 *     volwat: volumetric water content, either ice or liquid water
@@ -423,17 +414,16 @@ double Stefan::getDegSecNeeded(const double & dz, const double & volwat,
 	double needed = 0.;
 
 	double effvolwat = volwat;
-	// double lhfv = LHFUS *1000.; // volumetric latent heat fusion of water
-	double lhfv = 3.34e8;
-	needed = lhfv * effvolwat * dz * (sumresabv + 0.5 * dz / tk);
+//	double lhfv = LHFUS*1000.0; // volumetric latent heat fusion of water
+	//double lhfv = 3.34e8;
+	needed = LHFUS * effvolwat * dz * (sumresabv + 0.5 * dz / tk);
 
 	return needed;
 }
 ;
 
 //calculate partial depth based on extra degree seconds
-double Stefan::getPartialDepth(const double & volwat, const double & tk,
-		const double & sumresabv, const double & dse) {
+double Stefan::getPartialDepth(const double & volwat, const double & tk, const double & sumresabv, const double & dse) {
 	/* input
 	 *  dse: extra degree second
 	 */
@@ -454,9 +444,7 @@ double Stefan::getPartialDepth(const double & volwat, const double & tk,
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // update temperatures
 
-void Stefan::updateTemps(const double & tdrv, Layer *frontl, Layer *backl,
-		Layer* fstsoill, Layer* fstfntl, Layer *lstfntl, const int year,
-		const int doy) {
+void Stefan::updateTemps(const double & tdrv, Layer *frontl, Layer *backl,Layer* fstsoill, Layer* fstfntl, Layer *lstfntl, const int year,const int doy) {
 
 	itsumall = 0;
 	itsumabv = 0;
@@ -505,7 +493,309 @@ void Stefan::updateTemps(const double & tdrv, Layer *frontl, Layer *backl,
 	}
 
 	///////////////////////////////////////////////////////
-#ifndef CONTROL
+
+#ifdef SOITDATA
+    
+    Layer* currl = frontl;
+    double tmp1, temp50, deptharray[5], inter_temp;
+    
+    if ((year == 2009 && doy >= 141) || year == 2010 || year == 2011 || year ==2012 || year == 2013 || (year == 2014 && doy <= 186)) {
+        
+        while (currl != NULL) {
+            if (currl->isSoil()) {
+                
+                tmp1 = currl->dz / 2.0 + currl->z;
+                
+                if (tmp1 >= 0.5) {
+                    if (year == 2009)
+                        temp50 = temp2009[doy - 141][4];
+                    if (year == 2010)
+                        temp50 = temp2010[doy][4];
+                    if (year == 2011)
+                        temp50 = temp2011[doy][4];
+                    if (year == 2012)
+                        temp50 = temp2012[doy][4];
+                    if (year == 2013)
+                        temp50 = temp2013[doy][4];
+                    if (year == 2014)
+                        temp50 = temp2014[doy][4];
+
+                    
+                    currl->tem = temp50;
+                    
+                } else {
+
+                    if (year == 2009) {
+                        deptharray[0] = temp2009[doy - 141][0];
+                        deptharray[1] = temp2009[doy - 141][1];
+                        deptharray[2] = temp2009[doy - 141][2];
+                        deptharray[3] = temp2009[doy - 141][3];
+                        deptharray[4] = temp2009[doy - 141][4];
+                    }
+
+                    if (year == 2010) {
+                        deptharray[0] = temp2010[doy][0];
+                        deptharray[1] = temp2010[doy][1];
+                        deptharray[2] = temp2010[doy][2];
+                        deptharray[3] = temp2010[doy][3];
+                        deptharray[4] = temp2010[doy][4];
+                    }
+                    if (year == 2011) {
+                        deptharray[0] = temp2011[doy][0];
+                        deptharray[1] = temp2011[doy][1];
+                        deptharray[2] = temp2011[doy][2];
+                        deptharray[3] = temp2011[doy][3];
+                        deptharray[4] = temp2011[doy][4];
+                    }
+
+                    if (year == 2012) {
+                        deptharray[0] = temp2012[doy][0];
+                        deptharray[1] = temp2012[doy][1];
+                        deptharray[2] = temp2012[doy][2];
+                        deptharray[3] = temp2012[doy][3];
+                        deptharray[4] = temp2012[doy][4];
+                    }
+                    
+                    if (year == 2013) {
+                        deptharray[0] = temp2013[doy][0];
+                        deptharray[1] = temp2013[doy][1];
+                        deptharray[2] = temp2013[doy][2];
+                        deptharray[3] = temp2013[doy][3];
+                        deptharray[4] = temp2013[doy][4];
+                    }
+                    
+
+
+
+                    if (year == 2014) {
+                        deptharray[0] = temp2014[doy][0];
+                        deptharray[1] = temp2014[doy][1];
+                        deptharray[2] = temp2014[doy][2];
+                        deptharray[3] = temp2014[doy][3];
+                        deptharray[4] = temp2014[doy][4];
+                    }
+                    
+
+                    inter_temp = linear_interp(soildepth, deptharray, 0, 4, tmp1);
+                    currl->tem = inter_temp;
+                }
+            }
+            currl = currl->nextl;
+        }
+    }
+
+#endif //SOITDATA
+    
+#ifdef SOITDATAGAMMA
+    
+    Layer* currl = frontl;
+    double tmp1, tempgamma50, deptharray[7], inter_tempgamma;
+    
+    if ((year == 2009 && doy >= 255) || year == 2010 || year == 2011 || year ==2012 || year == 2013 || (year == 2014 && doy <= 186)) {
+        
+        while (currl != NULL) {
+            if (currl->isSoil()) {
+                
+                tmp1 = currl->dz / 2.0 + currl->z;
+                
+                if (tmp1 >= 2.0) {
+                    if (year == 2009)
+                        tempgamma50 = tempgamma2009[doy - 255][6];
+                    if (year == 2010)
+                        tempgamma50 = tempgamma2010[doy][6];
+                    if (year == 2011)
+                        tempgamma50 = tempgamma2011[doy][6];
+                    if (year == 2012)
+                        tempgamma50 = tempgamma2012[doy][6];
+                    if (year == 2013)
+                        tempgamma50 = tempgamma2013[doy][6];
+                    if (year == 2014)
+                        tempgamma50 = tempgamma2014[doy][6];
+                    
+                    
+                    currl->tem = tempgamma50;
+                    
+                } else {
+                    
+                    if (year == 2009) {
+                        deptharray[0] = tempgamma2009[doy - 141][0];
+                        deptharray[1] = tempgamma2009[doy - 141][1];
+                        deptharray[2] = tempgamma2009[doy - 141][2];
+                        deptharray[3] = tempgamma2009[doy - 141][3];
+                        deptharray[4] = tempgamma2009[doy - 141][4];
+                        deptharray[5] = tempgamma2009[doy - 141][5];
+                        deptharray[6] = tempgamma2009[doy - 141][6];
+                    }
+                    
+                    if (year == 2010) {
+                        deptharray[0] = tempgamma2010[doy][0];
+                        deptharray[1] = tempgamma2010[doy][1];
+                        deptharray[2] = tempgamma2010[doy][2];
+                        deptharray[3] = tempgamma2010[doy][3];
+                        deptharray[4] = tempgamma2010[doy][4];
+                        deptharray[5] = tempgamma2010[doy][5];
+                        deptharray[6] = tempgamma2010[doy][6];
+                    }
+                    if (year == 2011) {
+                        deptharray[0] = tempgamma2011[doy][0];
+                        deptharray[1] = tempgamma2011[doy][1];
+                        deptharray[2] = tempgamma2011[doy][2];
+                        deptharray[3] = tempgamma2011[doy][3];
+                        deptharray[4] = tempgamma2011[doy][4];
+                        deptharray[5] = tempgamma2011[doy][5];
+                        deptharray[6] = tempgamma2011[doy][6];
+                    }
+                    
+                    if (year == 2012) {
+                        deptharray[0] = tempgamma2012[doy][0];
+                        deptharray[1] = tempgamma2012[doy][1];
+                        deptharray[2] = tempgamma2012[doy][2];
+                        deptharray[3] = tempgamma2012[doy][3];
+                        deptharray[4] = tempgamma2012[doy][4];
+                        deptharray[5] = tempgamma2012[doy][5];
+                        deptharray[6] = tempgamma2012[doy][6];
+                    }
+                    
+                    if (year == 2013) {
+                        deptharray[0] = tempgamma2013[doy][0];
+                        deptharray[1] = tempgamma2013[doy][1];
+                        deptharray[2] = tempgamma2013[doy][2];
+                        deptharray[3] = tempgamma2013[doy][3];
+                        deptharray[4] = tempgamma2013[doy][4];
+                        deptharray[5] = tempgamma2013[doy][5];
+                        deptharray[6] = tempgamma2013[doy][6];
+                    }
+                    
+                    
+                    
+                    
+                    if (year == 2014) {
+                        deptharray[0] = tempgamma2014[doy][0];
+                        deptharray[1] = tempgamma2014[doy][1];
+                        deptharray[2] = tempgamma2014[doy][2];
+                        deptharray[3] = tempgamma2014[doy][3];
+                        deptharray[4] = tempgamma2014[doy][4];
+                        deptharray[5] = tempgamma2014[doy][5];
+                        deptharray[6] = tempgamma2014[doy][6];
+                    }
+                    
+                    
+                    inter_tempgamma = linear_interp(soildepthgamma, deptharray, 0, 6, tmp1);
+                    currl->tem = inter_tempgamma;
+                }
+            }
+            currl = currl->nextl;
+        }
+    }
+    
+#endif //SOITDATAGAMMA
+    
+#ifdef SOITDATABETASE
+    
+    Layer* currl = frontl;
+    double tmp1, tempbetase50, deptharray[7], inter_tempbetase;
+    
+    if ((year == 2009 && doy >= 272) || year == 2010 || year == 2011 || year ==2012 || (year == 2013&& doy <= 180) || (year == 2014 && doy <= 186)) {
+        
+        while (currl != NULL) {
+            if (currl->isSoil()) {
+                
+                tmp1 = currl->dz / 2.0 + currl->z;
+                
+                if (tmp1 >= 1.7) {
+                    if (year == 2009)
+                        tempbetase50 = tempbetase2009[doy - 272][6];
+                    if (year == 2010)
+                        tempbetase50 = tempbetase2010[doy][6];
+                    if (year == 2011)
+                        tempbetase50 = tempbetase2011[doy][6];
+                    if (year == 2012)
+                        tempbetase50 = tempbetase2012[doy][6];
+                    if (year == 2013)
+                        tempbetase50 = tempbetase2013[doy][6];
+                    if (year == 2014)
+                        tempbetase50 = tempbetase2014[doy][6];
+                    
+                    
+                    currl->tem = tempbetase50;
+                    
+                } else {
+                    
+                    if (year == 2009) {
+                        deptharray[0] = tempbetase2009[doy - 141][0];
+                        deptharray[1] = tempbetase2009[doy - 141][1];
+                        deptharray[2] = tempbetase2009[doy - 141][2];
+                        deptharray[3] = tempbetase2009[doy - 141][3];
+                        deptharray[4] = tempbetase2009[doy - 141][4];
+                        deptharray[5] = tempbetase2009[doy - 141][5];
+                        deptharray[6] = tempbetase2009[doy - 141][6];
+                    }
+                    
+                    if (year == 2010) {
+                        deptharray[0] = tempbetase2010[doy][0];
+                        deptharray[1] = tempbetase2010[doy][1];
+                        deptharray[2] = tempbetase2010[doy][2];
+                        deptharray[3] = tempbetase2010[doy][3];
+                        deptharray[4] = tempbetase2010[doy][4];
+                        deptharray[5] = tempbetase2010[doy][5];
+                        deptharray[6] = tempbetase2010[doy][6];
+                    }
+                    if (year == 2011) {
+                        deptharray[0] = tempbetase2011[doy][0];
+                        deptharray[1] = tempbetase2011[doy][1];
+                        deptharray[2] = tempbetase2011[doy][2];
+                        deptharray[3] = tempbetase2011[doy][3];
+                        deptharray[4] = tempbetase2011[doy][4];
+                        deptharray[5] = tempbetase2011[doy][5];
+                        deptharray[6] = tempbetase2011[doy][6];
+                    }
+                    
+                    if (year == 2012) {
+                        deptharray[0] = tempbetase2012[doy][0];
+                        deptharray[1] = tempbetase2012[doy][1];
+                        deptharray[2] = tempbetase2012[doy][2];
+                        deptharray[3] = tempbetase2012[doy][3];
+                        deptharray[4] = tempbetase2012[doy][4];
+                        deptharray[5] = tempbetase2012[doy][5];
+                        deptharray[6] = tempbetase2012[doy][6];
+                    }
+                    
+                    if (year == 2013) {
+                        deptharray[0] = tempbetase2013[doy][0];
+                        deptharray[1] = tempbetase2013[doy][1];
+                        deptharray[2] = tempbetase2013[doy][2];
+                        deptharray[3] = tempbetase2013[doy][3];
+                        deptharray[4] = tempbetase2013[doy][4];
+                        deptharray[5] = tempbetase2013[doy][5];
+                        deptharray[6] = tempbetase2013[doy][6];
+                    }
+                    
+                    
+                    
+                    
+                    if (year == 2014) {
+                        deptharray[0] = tempbetase2014[doy][0];
+                        deptharray[1] = tempbetase2014[doy][1];
+                        deptharray[2] = tempbetase2014[doy][2];
+                        deptharray[3] = tempbetase2014[doy][3];
+                        deptharray[4] = tempbetase2014[doy][4];
+                        deptharray[5] = tempbetase2014[doy][5];
+                        deptharray[6] = tempbetase2014[doy][6];
+                    }
+                    
+                    
+                    inter_tempbetase = linear_interp(soildepthbetase, deptharray, 0, 6, tmp1);
+                    currl->tem = inter_tempbetase;
+                }
+            }
+            currl = currl->nextl;
+        }
+    }
+    
+#endif //SOITDATABETASE
+    
+    
+/*#ifndef CONTROL
 	Layer* currl = frontl;
 	double tmp1, temp50, deptharray[5], inter_temp;
 #ifndef RAISED
@@ -626,9 +916,12 @@ void Stefan::updateTemps(const double & tdrv, Layer *frontl, Layer *backl,
 			}
 		}
 #endif
-	///////////////////////////////////////////////////////
+	
+*/
+        
+        
+        ///////////////////////////////////////////////////////
 	//check wheter is nan
-
 #ifdef CONTROL
 	for (int il = 0; il < MAX_GRN_LAY + 2; il++) {
 
@@ -640,7 +933,6 @@ void Stefan::updateTemps(const double & tdrv, Layer *frontl, Layer *backl,
 		}
 	}
 #endif
-
 }
 
 void Stefan::interpSnowTemp(Layer* frontl, Layer* fstsoill, const double & tdrv) {
@@ -673,8 +965,7 @@ void Stefan::interpSnowTemp(Layer* frontl, Layer* fstsoill, const double & tdrv)
 }
 ;
 
-void Stefan::iterate(const int &startind, const int &endind,
-		const bool & lstlaybot, const bool & fstlaytop, Layer *frontl) {
+void Stefan::iterate(const int &startind, const int &endind,const bool & lstlaybot, const bool & fstlaytop, Layer *frontl) {
 
 	tschanged = true;
 	tmld = 0; // tmld is time that is last determined
@@ -766,8 +1057,7 @@ int Stefan::updateOneTimeStep(const int startind, const int & endind,
 ;
 
 /*! the main calculation will be done here*/
-int Stefan::updateOneIteration(const int startind, const int & endind,
-		const bool & lstlaybot, const bool & fstlaytop, Layer *frontl) {
+int Stefan::updateOneIteration(const int startind, const int & endind,const bool & lstlaybot, const bool & fstlaytop, Layer *frontl) {
 	itsum++;
 	double tself, tdown, tup, t1, t2;
 	double hclat;
@@ -784,7 +1074,7 @@ int Stefan::updateOneIteration(const int startind, const int & endind,
 					t1 = tself;
 					t2 = (tdown + tself) / 2.;
 					if (t1 > 0 || t2 > 0) {
-						hclat = 3.337e5 * (currl->ice) / currl->dz;
+						hclat = LHFUS * (currl->ice) / currl->dz; //Y.Mi
 						cap[1] = (currl->getHeatCapacity() + hclat) * currl->dz;
 					} else {
 						cap[1] = currl->getHeatCapacity() * currl->dz;
@@ -795,9 +1085,8 @@ int Stefan::updateOneIteration(const int startind, const int & endind,
 					t2 = tself;
 					t1 = (tup + tself) / 2.;
 					if (t1 * t2 < 0) {
-						hclat = 3.337e5 * (currl->ice) / currl->dz;
-						cap[il] = (currl->getHeatCapacity() + hclat)
-								* currl->dz;
+						hclat = LHFUS * (currl->ice) / currl->dz; //Y.Mi
+						cap[il] = (currl->getHeatCapacity() + hclat) * currl->dz;
 					} else {
 						cap[il] = currl->getHeatCapacity() * currl->dz;
 					}
@@ -957,8 +1246,7 @@ void Stefan::processAboveLayers(Layer* frontl, Layer *backl, Layer*fstfntl,
 
 }
 
-void Stefan::processWholeColumn(Layer* frontl, Layer *backl, Layer*fstfntl,
-		Layer*lstfntl, const double & tdrv) {
+void Stefan::processWholeColumn(Layer* frontl, Layer *backl, Layer*fstfntl, Layer*lstfntl, const double & tdrv) {
 	double tc, hcap;
 	int startind, endind;
 
@@ -1083,13 +1371,12 @@ void Stefan::processBetweenLayers(Layer* frontl, Layer *backl, Layer*fstfntl,
 }
 ;
 
-void Stefan::processBelowLayers(Layer* frontl, Layer *backl, Layer*fstfntl,
-		Layer*lstfntl, const double & tdrv) {
+void Stefan::processBelowLayers(Layer* frontl, Layer *backl, Layer*fstfntl,Layer*lstfntl, const double & tdrv) {
 	double tc, hcap;
 	int startind, endind;
 
 	int ind = lstfntl->indl;
-	;
+	
 	t[ind] = 0; //assume the front is the top interface of virtual layer
 	e[ind] = 0;
 	s[ind] = 0.;
@@ -1097,8 +1384,7 @@ void Stefan::processBelowLayers(Layer* frontl, Layer *backl, Layer*fstfntl,
 	SoilLayer* slstfntl = dynamic_cast<SoilLayer*> (lstfntl);
 	int numfnt = slstfntl->fronts.size();
 
-	dx[ind] = max((double) 0.5 * lstfntl->dz, (double) lstfntl->dz
-			- slstfntl->fronts[numfnt - 1]->dz);
+	dx[ind] = max((double) 0.5 * lstfntl->dz, (double) lstfntl->dz - slstfntl->fronts[numfnt - 1]->dz);
 	if (slstfntl->fronts[numfnt - 1]->frzing == 1) {
 		cn[ind] = slstfntl->getUnfThermCond() / dx[ind];
 		cap[ind] = slstfntl->getUnfVolHeatCapa() * dx[ind];

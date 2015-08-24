@@ -48,8 +48,7 @@ void SnowLayer::updateDensity(){
     double tao1 = 86400.; //s
     double tao = 86400.; // one day time step
 	rho = (rho-denmax)* exp(- tao/tao1* adjust) + denmax;
-	if(rho>denmax)
-        rho= denmax;
+	if(rho>denmax)rho= denmax;
 };
 
 void SnowLayer::updateThick(){
@@ -94,21 +93,31 @@ void SnowLayer::updateThick(){
 	  double SnowLayer::getThermCond5Jordan(){
 	  	double tc=0;
 	    tc = TCAIR + (7.75e-5 * rho + 1.105e-6*rho*rho)*(TCICE-TCAIR);
-	    tc = 2.9*1.e-6 * rho*rho;
-	    if(tc<0.04) tc =0.04;
+	    tc = 2.9*1.e-6 * rho*rho*0.15;
+	    
+          if(tc<0.04) tc =0.04;
+          
+
 	  	return tc;
 	  }
 	 
 
 	 double SnowLayer::getFrzVolHeatCapa(){
 	 
-	   double vhc = SHCICE * ice/dz;	
+  //        double vhc = SHCICE * ice;///dz; Y.Mi unit of SHCICE is J kg-1
+         double vhc = 2.5e6;//300 * SHCSNOW;
+         
+       //  cout << vhc<<"f" <<endl;
 	 	return vhc;
 	 };
 
 	 double SnowLayer::getUnfVolHeatCapa(){
-	   double vhc = SHCICE * ice/dz;	
-	 	return vhc;
+	   //double vhc = SHCICE * ice;///dz; Y.Mi unit of SHCICE is J kg-1
+	 	double vhc = 300 * SHCSNOW;
+         
+      //   cout << vhc <<endl;
+         
+         return vhc;
 	 };	  
 	 
 	       // get albedo of visible radition

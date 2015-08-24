@@ -15,10 +15,10 @@ class MineralLayer: public SoilLayer{
 
 	MineralLayer(const double & pdz, int sttype , SoilLookup * soillup);
 
+
     void  updateProperty5Lookup();
     double getDryThermCond(const double & bulkden);
     double getDryThermCond(const double & tcsolid, const double & bulkden, const double & partden);
-    
     virtual bool isMoss();
     virtual bool isMineral();
 	virtual bool isPeat();

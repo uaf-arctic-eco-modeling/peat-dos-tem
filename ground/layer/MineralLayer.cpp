@@ -14,26 +14,32 @@ MineralLayer::MineralLayer(const double & pdz, int sttype , SoilLookup * soillup
 	
 };
 
-void MineralLayer::updateProperty5Lookup(){
+
+
+ void MineralLayer::updateProperty5Lookup(){
     	poro =  soillu->poro[stkey];
-    	tcsolid = soillu->Ksolids[stkey];
+    	
+    	//tcsolid = soillu->Ksolids[stkey];
+	   
 		hksat = soillu->Ksat[stkey];
 		psisat =  soillu->Psisat[stkey];
 		bsw = soillu->b[stkey];
-	//	bulkden =soillu->bulkden[stkey];
-        tcdry = soillu->tcdry[stkey];
-     //   prtlden =2700.;
-        prtlden =2220.0; //Y.Mi, data from Kristen, g/m3
-        bulkden =950000.0; //Y.Mi, data from Kristen, kg/m3
-        poro = 57.21;//Y.Mi, data from Kristen,%
-        tcdry = getDryThermCond(bulkden);
+		bulkden =soillu->bulkden[stkey];
+		 tcdry = soillu->tcdry[stkey];
+		 
+		// 
+		 prtlden =2700.;
+		 tcdry = getDryThermCond(bulkden);
 		//tcdry = getDryThermCond(tcsolid, bulkden, prtlden);
 		 
 		fldcap = soillu->fieldcap[stkey];
 		wltpnt =soillu->wiltp[stkey];
   	    tcsatunf= soillu->tcunfsat[stkey];
   	    tcsatfrz= soillu->tcfrzsat[stkey];
-   	    vhcsolid = soillu->Csolids[stkey];
+   	   // vhcsolid = soillu->Csolids[stkey];
+     
+        vhcsolid = 2.385e6;
+        tcsolid = 20; //Y.Mi
   	    
    	    albsatvis = soillu->albsatvis[stkey];
    	    albsatnir = soillu->albsatnir[stkey];
@@ -42,10 +48,11 @@ void MineralLayer::updateProperty5Lookup(){
    	    
    	    minliq = 0.05 *  1000. *dz;
    	    //minliq = 0.05 * poro * 1000. *dz;
-   	    maxliq = poro*1000.*dz;
-   	    maxice =poro*1000*dz -minliq;
+   	 maxliq = poro*1000.*dz;
+   	 maxice =poro*1000*dz -minliq;  
    	  //maxice =poro*917*dz -minliq;  
     };
+
 
 ///// some properties
 double MineralLayer::getDryThermCond(const double & bulkden){
@@ -64,6 +71,7 @@ double MineralLayer::getDryThermCond(const double & tcsolid, const double & bulk
    kdry = ((par_a* tcsolid - tcair) *bulkden + tcair*partden)/(partden - (1-par_a)*bulkden)	;
    return kdry;
 }     
+
 
 bool MineralLayer::isMoss(){
   return false;	

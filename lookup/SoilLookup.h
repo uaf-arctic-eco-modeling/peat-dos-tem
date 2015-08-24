@@ -8,6 +8,10 @@
 	#include <cmath>
 	#include <iostream>
 	#include "../inc/PhysicalConstants.h"
+
+#include <cstdlib>
+#include <cstring>
+#include <cstdio>
 	
 	using namespace std;
 

@@ -3,9 +3,9 @@
 	
 	const int MAX_SNW_LAY =6; //maximum number of Snow Layer
 
-	const int MAX_MOS_LAY =3; //2 maximum number of moss Layer
+	const int MAX_MOS_LAY =2; //2 maximum number of moss Layer
 	const int MAX_SLW_LAY =20; // 3 maximum number of shallow organic Layer
-	const int MAX_DEP_LAY =20; // 10, maximum number of deep organic Layer
+	const int MAX_DEP_LAY =30; // 10, maximum number of deep organic Layer
 	const int MAX_MIN_LAY =12; // 13, maximum number of mineral Layer (0.1,0.1,0.1,0.1, 0.2,0.2,0.2,0.3,0.3,0.3, 0.5, 1, 2)
 	const float MINETHICK[MAX_MIN_LAY] = {0.1,0.1,0.1,0.1, 0.2,0.2,0.2,0.3,0.3,0.3, 0.5, 1.0};//, 2.0};
 

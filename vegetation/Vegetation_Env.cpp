@@ -134,24 +134,37 @@ void Vegetation_Env::updateDaily(   const double & dayl){
 	ed->d_a2v.snfl = snfl ;
 	ed->d_a2v.rnfl=  rnfl;
 	
+    
+    
 	if(envlai >0){
+        
+        
+        
 		ed->d_vegd.rinter = getRainInterception(ed->d_a2v.rnfl);
-		ed->d_vegd.sinter = getSnowInterception(ed->d_a2v.snfl, envlai);
+        ed->d_vegd.sinter = getSnowInterception(ed->d_a2v.snfl, envlai);
 		ed->d_v2g.rthfl = ed->d_a2v.rnfl- ed->d_vegd.rinter;
-		ed->d_v2g.sthfl = ed->d_a2v.snfl -ed->d_vegd.sinter;
+        ed->d_v2g.sthfl = ed->d_a2v.snfl -ed->d_vegd.sinter;
 	
+//        cout<<ed->d_vegd.rinter<<"\t"<<ed->d_a2v.rnfl<<endl;
+//        cout<<ed->d_vegd.sinter<<"\t"<<ed->d_a2v.snfl<<endl;
+
+        
 		//temperature and pressure correction factor for conductances
 		double gcorr = 1.; //pow( (atmsd->ta +273.15)/293.15, 1.75); // * 101300/pa;
 		ed->d_vegd.m_vpd=0.;
 		double gl_st =0.;
+        
+ //       cout<<ed->d_vegd.btran<<endl;
 		
 		if(ed->d_vegd.btran>0){
 	 		//gl_st = getLeafStomaCond(ta,ed->m_vegd.ppfdabsorb, vpd, envlai, ed->d_vegd.btran, 
 			//				ed->d_vegd.m_ppfd, ed->d_vegd.m_vpd);
-     		gl_st = getLeafStomaCond(ta,downpar*EPAR, vpd, envlai, ed->d_vegd.btran, 
-					ed->d_vegd.m_ppfd, ed->d_vegd.m_vpd);
-					
+     		gl_st = getLeafStomaCond(ta,downpar*EPAR, vpd, envlai, ed->d_vegd.btran, ed->d_vegd.m_ppfd, ed->d_vegd.m_vpd);
+				
+
 		}
+        
+
 		
 		gl_st *= gcorr; 
 		double gl_bl = envpar.gl_bl; //boundary layer conductance (projected area basis) m/s
@@ -240,6 +253,8 @@ void Vegetation_Env::updateDaily(   const double & dayl){
 		  
 		} 
 
+
+        
 		ed->d_v2a.sublim = getCanopySubl(ed->d_vegd.rac,ed->d_vegd.sinter, envlai );
 		ed->d_vegd.cc = gc_e_wv;
 		ed->d_vegd.rc = 1./ed->d_vegd.cc;
@@ -249,6 +264,8 @@ void Vegetation_Env::updateDaily(   const double & dayl){
 	
 	 	ed->d_vegs.snow += ed->d_vegd.sinter-ed->d_v2g.sdrip -ed->d_v2a.sublim;
 	 	ed->d_vegs.rain += ed->d_vegd.rinter-ed->d_v2g.rdrip -ed->d_v2a.evapo;
+        
+
 		// ed->d_v2g.sw =  nirr-ed->d_v2a.solrad -ed->d_vegd.rac;
 	 
 	} else {   //envlai <=0, i.e., no vegetation?
@@ -282,8 +299,10 @@ void Vegetation_Env::updateDaily(   const double & dayl){
     ed->d_v2g.rthfl *= ed->y_vegd.vegfrac;
     ed->d_v2g.sthfl *= ed->y_vegd.vegfrac ;
     
-    ed->d_v2a.trans *= 0.015;
-    ed->d_v2a.evapo *= 0.0075;
+
+    
+//    ed->d_v2a.trans *= 0.015; //Y.Mi
+//    ed->d_v2a.evapo *= 0.0075;
 	
 }
 
@@ -315,7 +334,7 @@ double Vegetation_Env::getPenMonET(const double & ta, const double& vpd, const d
 		/*slope of pvs vs. T curve at T*/
 		double slope = (pvs1-pvs2)/(t1-t2);	
 		/*evapotranspiration*/
-		et = (slope*irad+ rho*CP *vpd/rhr)/((pa * CP *rv)/(lhvap*EPS *rhr)+slope);
+		et = (slope*irad+ rho*CP *vpd/rhr)/((pa * CP *rv)/(lhvap*EPS *rhr)+slope); //Y.MI
 		return et/lhvap;		
 }
 

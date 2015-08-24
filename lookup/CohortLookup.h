@@ -6,6 +6,10 @@
 	#include "../inc/timeconst.h"	
 	#include "../inc/layerconst.h"
 
+#include <cstdlib>
+#include <cstring>
+#include <cstdio>
+
 	const int MAX_SOC_DEP =7; // seven layers for soc
 	const int MAX_FR_INT =10; // 10 intervals for fine root production
 

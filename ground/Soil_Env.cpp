@@ -15,7 +15,8 @@ void Soil_Env::updateDailySurfFlux(Layer* frontl, const double & tsurf,
 	double albvis = frontl->getAlbedoVis();
 	double albnir = frontl->getAlbedoNir();
 
-	double insw = ed->d_v2g.sw * ed->y_vegd.vegfrac + (1 - ed->y_vegd.vegfrac) * ed->d_a2l.nirr;
+	double insw = ed->d_v2g.sw * ed->y_vegd.vegfrac + (1 - ed->y_vegd.vegfrac)
+			* ed->d_a2l.nirr;
 
 	ed->d_soi2a.solrad = insw * 0.5 * albvis + insw * 0.5 * albnir;
 
@@ -55,16 +56,11 @@ void Soil_Env::updateDailySurfFlux(Layer* frontl, const double & tsurf,
 	double evap = 0.;
 	if (availliq > 0 && frontl->frozen == -1) {
 		evap = getEvaporation(tsurf, dayl, rad);
-        
-       // cout<<availliq<<"\t"<<evap<<endl;
-        ed->d_soi2a.evap = min(availliq*0.01, evap);
-
-        
+		ed->d_soi2a.evap = min(availliq, evap);
 	} else {
 		ed->d_soi2a.evap = 0;
 	}
 
-  
 }
 
 double Soil_Env::getPenMonET(const double & ta, const double& vpd,
@@ -94,7 +90,7 @@ double Soil_Env::getPenMonET(const double & ta, const double& vpd,
 	/*slope of pvs vs. T curve at T*/
 	double slope = (pvs1 - pvs2) / (t1 - t2);
 	/*evapotranspiration*/
-	et = (slope * irad + rho * CP * vpd / rhr) / ((pa * CP * rv) / (lhvap * EPS * rhr) + slope);
+	et = (slope * irad + rho * CP * vpd / rhr)/ ((pa * CP * rv) / (lhvap * EPS* rhr) + slope);
 	return et / lhvap;
 }
 
@@ -108,8 +104,6 @@ double Soil_Env::getEvaporation(const double & tsurf, const double & dayl,
 	//double rhoa = ed->d_atmd.rhoa;
 	double vpdpa = ed->d_atmd.vpd;
 	//double dsr = ed->d_atms.dsr;
-    
-    
 	double daylsec = dayl * 3600;
 	double daytimerad = rad * 86400 / daylsec; //w/m2
 	/* correct conductances for temperature and pressure based on Jones (1992)
@@ -121,34 +115,28 @@ double Soil_Env::getEvaporation(const double & tsurf, const double & dayl,
 	double pmet = getPenMonET(tair, vpdpa, daytimerad, rbl, rbl);
 	double dsr = ed->d_atms.dsr;
 	double ratiomin = envpar.evapmin;// 0.15;
-    double ratio = 0.0;
 
 	evap = pmet * daylsec;
- 
- //   cout<<ed->d_v2g.rdrip + ed->d_v2g.rthfl + ed->d_snwd.melt<<"\t"<<evap<<"\t"<<ratiomin<<endl;
 
-//	if (ed->d_v2g.rdrip + ed->d_v2g.rthfl + ed->d_snwd.melt >= evap) {
-//		ratio = 0.3;
-//       
-//	} else {
-//		/* calculate the realized proportion of potential evaporation
-//		 as a function of the days since rain */
-//		//double ratio =0.3/pow(dsr, 2.0);
-//		ratio = 0.3 / pow(dsr, 2.0);
-//		//if(ratio<0.2) ratio =0.2;//good for dftc and dftb
-//		//first determine the minimum ratio for dftb, since it is burned site
-//		//the effect of transpiration is smaller than soil surface evaporation
-//
-//		if (ratio < ratiomin)
-//			ratio = ratiomin;
-//
-//		
-//	}
+	if (ed->d_v2g.rdrip + ed->d_v2g.rthfl + ed->d_snwd.melt >= evap) {
+		evap *= 0.6;
+	} else {
+		/* calculate the realized proportion of potential evaporation
+		 as a function of the days since rain */
+		//double ratio =0.3/pow(dsr, 2.0);
+		double ratio = 0.3 / pow(dsr, 2.0);
+		//if(ratio<0.2) ratio =0.2;//good for dftc and dftb
+		//first determine the minimum ratio for dftb, since it is burned site
+		//the effect of transpiration is smaller than soil surface evaporation
 
-    evap *= 0.08;
+		if (ratio < ratiomin)
+			ratio = ratiomin;
+
+		evap *= ratio;
+	}
+
+ //   evap *= 0.001; //Y.Mi
     
-//    cout<<ratio<<"\t"<<evap<<endl;
-    evap=evap*0.05;
 	return evap;
 }
 
@@ -488,52 +476,52 @@ double Soil_Env::getFracSat(const double & wtd) {
 }
 
 double Soil_Env::getWaterTable(Layer* fstsoill, const int year, const int doy) {
-
-	Layer* currl = fstsoill;
-	double wtd = 0;
-	double s, dz, por;
-	double thetai, thetal;
-	double sums = 0.;
-	double ztot = 0.;
-
-	while (currl != NULL) {
-		//sl = dynamic_cast<SoilLayer*>currl;
-		if (currl->isRock())
-			break;
-
-		por = currl->poro;
-		dz = currl->dz;
-		thetai = currl->getVolIce(); //ice content
-		thetai = min(por - currl->minliq / (dz * 1000.), thetai);
-		thetal = currl->getVolLiq();//liquid water
-		thetal = min(por - thetai, thetal);
-
-		if ((por - thetai) <= 0.0) //saturated by ice
-			s = 1.0;
-		else
-			s = thetal / (por - thetai);
-
-		s = min(s, 1.0);
-
-		if (s > 0.95 || (thetai > 0.0 && thetal < 0.1)) { //|| thetal < 0.1
-			ztot = ztot - sums;
-			break;
-		} else {
-			ztot += dz;
-			sums = s * dz;
-		}
-		//////////////////////////////
-		//else{
-		//	ztot+=(1-s)*dz;
-		//	sums+=s*dz;
-		//}
-		//s = min(s, 1.0);
-		//sums += s * dz;
-		//ztot += dz;
-
-		currl = currl->nextl;
-	}
-	wtd = ztot;// - sums;
+    
+    Layer* currl = fstsoill;
+    double wtd = 0;
+    double s, dz, por;
+    double thetai, thetal;
+    double sums = 0.;
+    double ztot = 0.;
+    
+    while (currl != NULL) {
+        //sl = dynamic_cast<SoilLayer*>currl;
+        if (currl->isRock())
+            break;
+        
+        por = currl->poro;
+        dz = currl->dz;
+        thetai = currl->getVolIce(); //ice content
+        thetai = min(por - currl->minliq / (dz * 1000.), thetai);
+        thetal = currl->getVolLiq();//volumetic liquid water
+        thetal = min(por - thetai, thetal);
+        
+        if ((por - thetai) <= 0.0) //saturated by ice
+            s = 1.0;
+        else
+            s = thetal / (por - thetai);
+        
+        s = min(s, 1.0);
+        
+        if (s > 0.95|| (thetai > 0.0)){// && thetal < 0.1)) { //|| thetal < 0.1
+            ztot = ztot - sums;
+            break;
+        } else {
+            ztot += dz;
+            sums = s * dz;
+        }
+        //////////////////////////////
+        //else{
+        //	ztot+=(1-s)*dz;
+        //	sums+=s*dz;
+        //}
+        //s = min(s, 1.0);
+        //sums += s * dz;
+        //ztot += dz;
+        
+        currl = currl->nextl;
+    }
+    wtd = ztot;// - sums;
     
     currl = fstsoill;
     double temtot = 0.0;
@@ -541,28 +529,28 @@ double Soil_Env::getWaterTable(Layer* fstsoill, const int year, const int doy) {
     ztot = 0.0;
     double wtthr = 0.35;
     
-    if (ed->cd->drgtype == 1) {
+    if (ed->cd->drgtype == 0) {// Bug? 0 for well drained site, Y.Mi
+        //        if (ed->cd->drgtype == 1) {
         while (currl != NULL) {
             if (currl->isRock())
-				break;
+                break;
             
             ztot = ztot + currl->dz;
             if (ztot > wtthr) { //35
                 double avgtem = temtot / icount;
                 
                 if (avgtem < 0.0)
-					break;
+                    break;
                 
                 double sftension = -0.00017 * avgtem + 0.0761;
                 double theta = 0.35; //degree
-                double hrise = 2 * sftension * cos(theta) / (1000 * 9.8
-                                                             * 0.0001);
+                double hrise = 2 * sftension * cos(theta) / (1000 * 9.8* 0.0001);
                 
                 if (wtd < wtthr)
-					wtd = wtd - hrise;
+                    wtd = wtd - hrise;
                 
-   //             if (wtd < 0.0)
-	//				wtd = 0.01;
+                //             if (wtd < 0.0)
+                //				wtd = 0.01;
                 
                 break;
             } else {
@@ -572,382 +560,85 @@ double Soil_Env::getWaterTable(Layer* fstsoill, const int year, const int doy) {
             }
         }
     }
-
-	/*
-
-	 Layer* currl = fstsoill;
-	 double wtd = 0;
-	 double s, dz, por;
-	 double thetai, thetal;
-
-	 bool bottomsat = true; //Yuan: initialize the bottom layer as saturated
-	 double sums = 0.;
-	 double ztot = 0.;
-	 while (currl != NULL) {
-	 if (!currl->isRock()) {
-	 dz = currl->dz;
-	 ztot += dz;
-	 por = currl->poro;
-	 thetai = currl->getVolIce();
-	 thetai = min(por - currl->minliq / (dz * 1000.), thetai);
-	 thetal = currl->getVolLiq();
-	 thetal = min(por - thetai, thetal);
-
-	 s = thetal / (por - thetai);
-	 if (bottomsat) { //Yuan: if bottom-layer saturated
-	 if (s > 0.999) { //
-	 sums = ztot;
-	 } else {
-	 bottomsat = false;
-	 sums += (max(0., s - 0.6)) / (1.0 - 0.6) * dz;
-	 //if over 0.6 saturation, let the lower porition be part of below water table
-	 // this is arbitrary, but useful if the deeper layer is thick (1 or 2 m)
-
-	 }
-	 }
-
-	 }
-	 currl = currl->prevl;
-	 }
-
-	 wtd = ztot - sums; //Yuan: the water table is measured from ground surface
-	 */
-	////////////////////////////////////////////////////
-
-//#ifndef CONTROL
-//	if (year == 2005) {
-//		//#ifdef CONTROL
-//		//		if (doy >= 175 && doy <= 290) {
-//		//			int index = doy - 175;
-//		//			wtd = wtb2005[index] / 100.0;
-//		//		}
-//		//#endif
-//
-//#ifdef LOWERED
-//		if (doy >= 175 && doy <= 290) {
-//			int index = doy - 175;
-//			wtd = wtb2005[index] / 100.0;
-//
-//			currl = fstsoill;
-//			while (currl != NULL) {
-//				if (currl->isRock())
-//				break;
-//
-//				if ((currl->z + currl->dz / 2.0) < wtd)
-//				wtd = wtd;
-//				else {
-//					if (currl->tem <= 0.0) {
-//						currl->liq = 0.05 * currl->dz * 1000.0;
-//						currl->ice = (currl->poro - 0.05) * currl->dz * 917.0;
-//					} else {
-//						currl->liq = (currl->poro - 0.05) * currl->dz * 917.0;
-//						currl->ice = 0.05 * currl->dz * 1000.0;
-//					}
-//				}
-//				currl = currl->nextl;
-//			}
-//		}
-//#endif
-//
-//#ifdef RAISED
-//		if (doy >= 200 && doy <= 278) {
-//			int index = doy - 200;
-//			wtd = wtb2005[index] / 100.0;
-//
-//			currl = fstsoill;
-//			while (currl != NULL) {
-//				if (currl->isRock())
-//				break;
-//
-//				if ((currl->z + currl->dz / 2.0) < wtd)
-//				wtd = wtd;
-//				else {
-//					if (currl->tem <= 0.0) {
-//						currl->liq = 0.05 * currl->dz * 1000.0;
-//						currl->ice = (currl->poro - 0.05) * currl->dz * 917.0;
-//					} else {
-//						currl->liq = (currl->poro - 0.05) * currl->dz * 917.0;
-//						currl->ice = 0.05 * currl->dz * 1000.0;
-//					}
-//				}
-//				currl = currl->nextl;
-//			}
-//		}
-//#endif
-
-//	}
-
-//observed water table level
     
-// if (year == 2011) {
-//		if (doy >= 153 && doy <= 263) {
-//			int index = doy - 153;
-//			wtd = wtb2011[index] / 100.0;
-//
-//			currl = fstsoill;
-//			while (currl != NULL) {
-//				if (currl->isRock())
-//				break;
-//
-//				if ((currl->z + currl->dz / 2.0) < wtd)
-//				wtd = wtd;
-//				else {
-//					if (currl->tem <= 0.0) {
-//						currl->liq = 0.05 * currl->dz * 1000.0;
-//						currl->ice = (currl->poro - 0.05) * currl->dz * 917.0;
-//					} else {
-//						currl->liq = (currl->poro - 0.05) * currl->dz * 917.0;
-//						currl->ice = 0.05 * currl->dz * 1000.0;
-//					}
-//				}
-//				currl = currl->nextl;
-//			}
-//		}
-//	}
-//    
-//    else if (year == 2012) {
-//		if (doy >= 163 && doy <= 271) {
-//			int index = doy - 163;
-//			wtd = wtb2012[index] / 100.0;
-//            
-//			currl = fstsoill;
-//			while (currl != NULL) {
-//				if (currl->isRock())
-//                    break;
-//                
-//				if ((currl->z + currl->dz / 2.0) < wtd)
-//                    wtd = wtd;
-//				else {
-//					if (currl->tem <= 0.0) {
-//						currl->liq = 0.05 * currl->dz * 1000.0;
-//						currl->ice = (currl->poro - 0.05) * currl->dz * 917.0;
-//					} else {
-//						currl->liq = (currl->poro - 0.05) * currl->dz * 917.0;
-//						currl->ice = 0.05 * currl->dz * 1000.0;
-//					}
-//				}
-//				currl = currl->nextl;
-//			}
-//		}
-//	} else if (year == 2013) {
-//		if (doy >= 162 && doy <= 246) {
-//			int index = doy - 162;
-//			wtd = wtb2013[index] / 100.0;
-//            
-//			currl = fstsoill;
-//			while (currl != NULL) {
-//				if (currl->isRock())
-//                    break;
-//                
-//				if ((currl->z + currl->dz / 2.0) < wtd)
-//                    wtd = wtd;
-//				else {
-//					if (currl->tem <= 0.0) {
-//						currl->liq = 0.05 * currl->dz * 1000.0;
-//						currl->ice = (currl->poro - 0.05) * currl->dz * 917.0;
-//					} else {
-//						currl->liq = (currl->poro - 0.05) * currl->dz * 917.0;
-//						currl->ice = 0.05 * currl->dz * 1000.0;
-//					}
-//				}
-//				currl = currl->nextl;
-//			}
-//		}
-//	}
-
+#ifdef WTDATA
+    if (year == 2011) {
+        if (doy >= 153 && doy <= 263) {
+            int index = doy - 153;
+            wtd = wtb2011[index] / 100.0;
+            
+            currl = fstsoill;
+            while (currl != NULL) {
+                if (currl->isRock())
+                    break;
+                
+                if ((currl->z + currl->dz / 2.0) < wtd)
+                    wtd = wtd;
+                else {
+                    if (currl->tem <= 0.0) {
+                        currl->liq = 0.05 * currl->dz * 1000.0;
+                        currl->ice = (currl->poro - 0.05) * currl->dz * 917.0;
+                    } else {
+                        currl->liq = (currl->poro - 0.05) * currl->dz * 917.0;
+                        currl->ice = 0.05 * currl->dz * 1000.0;
+                    }
+                }
+                currl = currl->nextl;
+            }
+        }
+    }
     
-//    else if (year == 2009) {
-//		if (doy >= 151 && doy <= 256) {
-//			int index = doy - 151;
-//			wtd = wtb2009[index] / 100.0;
-//            
-//			currl = fstsoill;
-//			while (currl != NULL) {
-//				if (currl->isRock())
-//                    break;
-//                
-//				if ((currl->z + currl->dz / 2.0) < wtd)
-//                    wtd = wtd;
-//				else {
-//					if (currl->tem <= 0.0) {
-//						currl->liq = 0.05 * currl->dz * 1000.0;
-//						currl->ice = (currl->poro - 0.05) * currl->dz * 917.0;
-//					} else {
-//						currl->liq = (currl->poro - 0.05) * currl->dz * 917.0;
-//						currl->ice = 0.05 * currl->dz * 1000.0;
-//					}
-//				}
-//				currl = currl->nextl;
-//			}
-//		}
-//    
-//    else if (year == 2007) {
-//		if (doy >= 149 && doy <= 253) {
-//			int index = doy - 149;
-//			wtd = wtb2007[index] / 100.0;
-//
-//			currl = fstsoill;
-//			while (currl != NULL) {
-//				if (currl->isRock())
-//				break;
-//
-//				if ((currl->z + currl->dz / 2.0) < wtd)
-//				wtd = wtd;
-//				else {
-//					if (currl->tem <= 0.0) {
-//						currl->liq = 0.05 * currl->dz * 1000.0;
-//						currl->ice = (currl->poro - 0.05) * currl->dz * 917.0;
-//					} else {
-//						currl->liq = (currl->poro - 0.05) * currl->dz * 917.0;
-//						currl->ice = 0.05 * currl->dz * 1000.0;
-//					}
-//				}
-//				currl = currl->nextl;
-//			}
-//		}
-//	} else if (year == 2008) {
-//		if (doy >= 143 && doy <= 220) {
-//			int index = doy - 143;
-//			wtd = wtb2008[index] / 100.0;
-//
-//			currl = fstsoill;
-//			while (currl != NULL) {
-//				if (currl->isRock())
-//				break;
-//
-//				if ((currl->z + currl->dz / 2.0) < wtd)
-//				wtd = wtd;
-//				else {
-//					if (currl->tem <= 0.0) {
-//						currl->liq = 0.05 * currl->dz * 1000.0;
-//						currl->ice = (currl->poro - 0.05) * currl->dz * 917.0;
-//					} else {
-//						currl->liq = (currl->poro - 0.05) * currl->dz * 917.0;
-//						currl->ice = 0.05 * currl->dz * 1000.0;
-//					}
-//				}
-//				currl = currl->nextl;
-//			}
-//		}
-//	} else if (year == 2009) {
-//		if (doy >= 151 && doy <= 256) {
-//			int index = doy - 151;
-//			wtd = wtb2009[index] / 100.0;
-//
-//			currl = fstsoill;
-//			while (currl != NULL) {
-//				if (currl->isRock())
-//				break;
-//
-//				if ((currl->z + currl->dz / 2.0) < wtd)
-//				wtd = wtd;
-//				else {
-//					if (currl->tem <= 0.0) {
-//						currl->liq = 0.05 * currl->dz * 1000.0;
-//						currl->ice = (currl->poro - 0.05) * currl->dz * 917.0;
-//					} else {
-//						currl->liq = (currl->poro - 0.05) * currl->dz * 917.0;
-//						currl->ice = 0.05 * currl->dz * 1000.0;
-//					}
-//				}
-//				currl = currl->nextl;
-//			}
-//		}
-//	} else if (year == 2010) {
-//		if (doy >= 158 && doy <= 263) {
-//			int index = doy - 158;
-//			wtd = wtb2010[index] / 100.0;
-//
-//			currl = fstsoill;
-//			while (currl != NULL) {
-//				if (currl->isRock())
-//				break;
-//
-//				if ((currl->z + currl->dz / 2.0) < wtd)
-//				wtd = wtd;
-//				else {
-//					if (currl->tem <= 0.0) {
-//						currl->liq = 0.05 * currl->dz * 1000.0;
-//						currl->ice = (currl->poro - 0.05) * currl->dz * 917.0;
-//					} else {
-//						currl->liq = (currl->poro - 0.05) * currl->dz * 917.0;
-//						currl->ice = 0.05 * currl->dz * 1000.0;
-//					}
-//				}
-//				currl = currl->nextl;
-//			}
-//		}
-//	} else if (year == 2011) {
-//		if (doy >= 153 && doy <= 263) {
-//			int index = doy - 153;
-//			wtd = wtb2011[index] / 100.0;
-//
-//			currl = fstsoill;
-//			while (currl != NULL) {
-//				if (currl->isRock())
-//				break;
-//
-//				if ((currl->z + currl->dz / 2.0) < wtd)
-//				wtd = wtd;
-//				else {
-//					if (currl->tem <= 0.0) {
-//						currl->liq = 0.05 * currl->dz * 1000.0;
-//						currl->ice = (currl->poro - 0.05) * currl->dz * 917.0;
-//					} else {
-//						currl->liq = (currl->poro - 0.05) * currl->dz * 917.0;
-//						currl->ice = 0.05 * currl->dz * 1000.0;
-//					}
-//				}
-//				currl = currl->nextl;
-//			}
-//		}
-//	}
-//        else {
-//            
-//
-//		
-//	}
-
-//#endif
-	///////////////////////////////////////////////////
-//#ifdef CONTROL
-//	currl = fstsoill;
-//	double temtot = 0.0;
-//	int icount = 0;
-//	ztot = 0.0;
-//	double wtthr = 0.35;
-//
-//	if (ed->cd->drgtype == 1) {
-//		while (currl != NULL) {
-//			if (currl->isRock())
-//				break;
-//
-//			ztot = ztot + currl->dz;
-//			if (ztot > wtthr) { //35
-//				double avgtem = temtot / icount;
-//
-//				if (avgtem < 0.0)
-//					break;
-//
-//				double sftension = -0.00017 * avgtem + 0.0761;
-//				double theta = 0.35; //degree
-//				double hrise = 2 * sftension * cos(theta) / (1000 * 9.8
-//						* 0.0001);
-//
-//				if (wtd < wtthr)
-//					wtd = wtd - hrise;
-//				if (wtd < 0.0)
-//					wtd = 0.0;
-//
-//				break;
-//			} else {
-//				currl = currl->nextl;
-//				temtot = temtot + currl->tem;
-//				icount++;
-//			}
-//		}
-//	}
-//#endif
+    else if (year == 2012) {
+        if (doy >= 163 && doy <= 271) {
+            int index = doy - 163;
+            wtd =wtb2012[index] / 100.0;
+            
+            currl = fstsoill;
+            while (currl != NULL) {
+                if (currl->isRock())
+                    break;
+                
+                if ((currl->z + currl->dz / 2.0) < wtd)
+                    wtd = wtd;
+                else {
+                    if (currl->tem <= 0.0) {
+                        currl->liq = 0.05 * currl->dz * 1000.0;
+                        currl->ice = (currl->poro - 0.05) * currl->dz * 917.0;
+                    } else {
+                        currl->liq = (currl->poro - 0.05) * currl->dz * 917.0;
+                        currl->ice = 0.05 * currl->dz * 1000.0;
+                    }
+                }
+                currl = currl->nextl;
+            }
+        }
+    } else if (year == 2013) {
+        if (doy >= 162 && doy <= 246) {
+            int index = doy - 162;
+            wtd = wtb2013[index] / 100.0;
+            
+            currl = fstsoill;
+            while (currl != NULL) {
+                if (currl->isRock())
+                    break;
+                
+                if ((currl->z + currl->dz / 2.0) < wtd)
+                    wtd = wtd;
+                else {
+                    if (currl->tem <= 0.0) {
+                        currl->liq = 0.05 * currl->dz * 1000.0;
+                        currl->ice = (currl->poro - 0.05) * currl->dz * 917.0;
+                    } else {
+                        currl->liq = (currl->poro - 0.05) * currl->dz * 917.0;
+                        currl->ice = 0.05 * currl->dz * 1000.0;
+                    }
+                }
+                currl = currl->nextl;
+            }
+        }
+    }
+    
+#endif //define WTDATA
 	return wtd;
 }
 
@@ -1019,7 +710,7 @@ double Soil_Env::getRunoffVIC(Layer* fstsoill, const double & rnth,
 				basis, 1. + b_infilt));
 
 	}
-	if (runoff < 0) //Y.Mi commented jan 2015
+	if (runoff < 0)
 		runoff = 0.;
 
 	return runoff;
@@ -1058,7 +749,7 @@ double Soil_Env::getBaseFlow(double const & wetness) {
 		dt_bf += Dsmax * (1 - Ds / Ws) * pow(frac, 2.); // in original code, 2 is replaced by c
 		// but in Liang et al.,1994, 2 was used
 	}
-	if (dt_bf < 0) //Y.Mi commented jan 2015
+	if (dt_bf < 0)
 		dt_bf = 0;
 	return dt_bf;
 
@@ -1157,7 +848,6 @@ double Soil_Env::getRunoff(Layer* fstsoill, const double & rnth,
 	double avgs = sums / ztot;
 	runoff = (frasat + (1 - frasat) * pow((double) avgs, 4.)) * (rnth + melt);
 
-//    runoff = 0.0; // Y.Mi jan 2015
 	return runoff;
 }
 ;
@@ -1466,7 +1156,6 @@ double Soil_Env::getSoilTransFactor(Layer* fstsoill) {
 		btran = 1;
 
 	}
-    
 	return btran;
 }
 

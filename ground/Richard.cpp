@@ -46,9 +46,17 @@ void Richard::update(Layer * frontl, Layer *backl, Layer *fstsoill,Layer* drainl
 	int ind = 0;
 	numal = 0;
 	double roottot = 0.;
+    
+//    while (currl != NULL){
+//       cout<<currl->liq<<endl;
+//    currl = currl->nextl;
+//    }
+//    
+//    currl = fstsoill;
+    
 	while (currl != NULL) {
 		if (currl->isSoil()) {
-			if (currl->frozen == -1) {
+			if (currl->frozen == -1) {//unfrozen
 				numal++;
 				ind++;
 				roottot += rootr[ind];
@@ -98,6 +106,9 @@ void Richard::update(Layer * frontl, Layer *backl, Layer *fstsoill,Layer* drainl
 		}
 
 		currl->liq = liqld[ind];
+        
+//        cout<<currl->liq<<endl;
+        
 		if (currl->liq < 0) { //currl->minliq){
 			string msg = "water is negative in richard";
 			//    		char* msgc = const_cast< char* > ( msg.c_str());
@@ -121,17 +132,16 @@ void Richard::update(Layer * frontl, Layer *backl, Layer *fstsoill,Layer* drainl
 }
 ;
 
-void Richard::iterate(Layer *fstsoill, const double & trans,
-		const double & evap, const double & infil, const double & drain) {
+void Richard::iterate(Layer *fstsoill, const double & trans,const double & evap, const double & infil, const double & drain) {
 
 	tschanged = true;
 	tmld = 0; // tmld is time that is last determined
 	itsum = 0;
 	tleft = 1; // at beginning of update, tleft is one day
 	if (infil > 0) {
-		TSTEPORG = TSTEPMAX / 5.;
+		TSTEPORG = TSTEPMAX / 5.; //0.04
 	} else {
-		TSTEPORG = TSTEPMAX;
+		TSTEPORG = TSTEPMAX; //0.2
 	}
 	tstep = TSTEPORG;
 
@@ -184,8 +194,7 @@ void Richard::iterate(Layer *fstsoill, const double & trans,
 }
 ;
 
-int Richard::updateOneTimeStep(Layer *fstsoill, const double & trans,
-		const double & evap, const double & infil, const double & drain) {
+int Richard::updateOneTimeStep(Layer *fstsoill, const double & trans, const double & evap, const double & infil, const double & drain) {
 	int status = -1;
 	int is;
 
@@ -193,7 +202,7 @@ int Richard::updateOneTimeStep(Layer *fstsoill, const double & trans,
 		liqii[i] = liqis[i];
 	}
 
-	for (int i = 0; i < ITMAX; i++) {
+	for (int i = 0; i < ITMAX; i++) { //ITMAX=1
 
 		is = updateOneIteration(fstsoill, trans, evap, infil, drain);
 
@@ -236,9 +245,12 @@ int Richard::updateOneIteration(Layer *fstsoill, const double & trans,const doub
 	double hksat, bsw, s_node, psisat;
 	double wimp = 0.001;// mimumum pore for water to exchange between two layers
 	double smpmin = -1.e8;
-	double dt = tstep * 86400;
+	double dt = tstep * 86400; //s
 	const double iithres = 0.01;
 	double totalfrac = 0.0;
+ 
+    
+//   cout<<tstep <<"\t"<< evap<<"\t"<<infil<<"\t"<<drain<<"\t"<<endl;
 
 	SoilLayer* nexts, *thsl;
 	int ind = 0;
@@ -264,6 +276,9 @@ int Richard::updateOneIteration(Layer *fstsoill, const double & trans,const doub
 		poro1 = poro[ind];
 		effporo1 = poro1;
 		volliq1 = liqii[ind] / dzmm[ind];
+        
+//        cout<<liqii[ind]<<"\t"<<dzmm[ind]<<endl;
+        
 		hksat = thsl->hksat;
 		bsw = thsl->bsw;
 
@@ -330,12 +345,12 @@ int Richard::updateOneIteration(Layer *fstsoill, const double & trans,const doub
 
 	// for first layer
 	ind = 1;
-	double qtrans = trans;
+    double qtrans = trans;//*dt; //Y.Mi
 	double den, num;
 	double dqodw1, dqodw2, dqidw0, dqidw1;
 	double sdamp = 0.;
 
-	qin[ind] = infil - evap;
+    qin[ind] = (infil - evap);//*dt; //Y.Mi
     
 	den = zmm[ind + 1] - zmm[ind];
 	num = smp[ind + 1] - smp[ind] - den;
@@ -390,7 +405,7 @@ int Richard::updateOneIteration(Layer *fstsoill, const double & trans,const doub
 
 		dqidw0 = -(-hk[ind - 1] * dsmpdw[ind - 1] + num * dhkdw[ind - 1]) / den;
 		dqidw1 = -(hk[ind - 1] * dsmpdw[ind] + num * dhkdw[ind - 1]) / den;
-		qout[ind] = hk[ind];
+        qout[ind] = 0.0;//hk[ind]; //Y.Mi, no out flowing for bog
 
 		dqodw1 = dhkdw[ind];
 

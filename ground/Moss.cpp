@@ -9,14 +9,30 @@ Moss::Moss(){
 void Moss::updateThicknesses(const double & thickness){
 	thick = thickness;
 	num =0;
-	if(thickness>=0.02 && thickness<0.04){
+/*	if(thickness>=0.02 && thickness<0.04){
+    dza[0]=thickness;
+    dza[1]=-1;
+    num =1;
+}else if (thickness>=0.04 ){
+    dza[0]=0.02;
+    dza[1]=thickness-0.02;
+    num =2;
+*/
+    
+    if(thickness>=0.02 && thickness<0.1){
 	 dza[0]=thickness;
 	 dza[1]=-1;
 	 num =1;
-	}else if (thickness>=0.04 ){
-	 dza[0]=0.02;
-	 dza[1]=thickness-0.02;
-	 num =2;		
+	}else if (thickness>=0.1 && thickness<0.2 ){
+	 dza[0]=0.1;
+	 dza[1]=thickness-0.1;
+	 num =2;
+        
+    }else if (thickness>=0.2 ){
+        dza[0]=0.1;
+        dza[1]=0.2;
+        dza[2]=thickness-0.1;
+        num =3;
 					
 	}
 };

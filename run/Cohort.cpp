@@ -472,9 +472,7 @@ int Cohort::timerOutputYearIndex(bool equiled, bool spined, bool outputSpinup) {
 }
 ;
 
-void Cohort::updateMonthly(const int & outputyrind, const int & yrcnt,
-		const int & currmind, const int & dinmcurr, const bool & assigneq,
-		const bool & useeq) {
+void Cohort::updateMonthly(const int & outputyrind, const int & yrcnt,const int & currmind, const int & dinmcurr, const bool & assigneq,const bool & useeq) {
 
 	if (veupdateLAI5Vegc) {
 		ve.updateLAI5Vegc = true;
@@ -490,6 +488,8 @@ void Cohort::updateMonthly(const int & outputyrind, const int & yrcnt,
 		updateMonthly_Fir(yrcnt, currmind);
 	}
 
+    
+    
 	if (dslmodule) {
 #ifdef PROJECTION
 		updateMonthly_Dsl(currmind);
@@ -500,9 +500,13 @@ void Cohort::updateMonthly(const int & outputyrind, const int & yrcnt,
 	}
 
 	int calyr = timer->getCalendarYear(equiled, spined);
+    
+    
+    
 	if (envmodule) {
 		updateMonthly_Env(yrcnt, calyr, currmind, dinmcurr, assigneq);
 	}
+
 
 	if (ecomodule) {
 		updateMonthly_Bgc(yrcnt, calyr, currmind, dinmcurr, useeq);
@@ -612,8 +616,7 @@ void Cohort::updateMonthly_Dsl(const int & currmind) {
 /////////////////////////////////////////////////////////
 //Environment Module Calling at monthly time-step, but involving daily time-step running
 /////////////////////////////////////////////////////////
-void Cohort::updateMonthly_Env(const int & yrcnt, const int & calyr,
-		const int & currmind, const int & dinmcurr, const bool & assigneq) {
+void Cohort::updateMonthly_Env(const int & yrcnt, const int & calyr,const int & currmind, const int & dinmcurr, const bool & assigneq) {
 
 	double tdrv, daylength;
 
@@ -646,16 +649,15 @@ void Cohort::updateMonthly_Env(const int & yrcnt, const int & calyr,
 	if (currmind >= 5 && currmind <= 9) { //for warm season
 
 		if (cd->vegtype == 0) {
-			if (ed->d_soid.watertab > 0.03)
-				ed->d_soid.nfactor = 1; //tundra
-			else
-				ed->d_soid.nfactor = 1;
+//			if (ed->d_soid.watertab > 0.03)
+            ed->d_soid.nfactor = 0.75;// tundra Y.Mi
+//			else
+//				ed->d_soid.nfactor = 1;
 		} else if (cd->vegtype == 1) { //aspen
 			ed->d_soid.nfactor = 0.94; //derived from tower
 		} else {
 			if (fd->ysf < ve.envpar.matureage) {
-				ed->d_soid.nfactor = 1.1 - (fd->ysf) / ve.envpar.matureage
-						* (1.1 - 0.66);
+				ed->d_soid.nfactor = 1.1 - (fd->ysf) / ve.envpar.matureage* (1.1 - 0.66);
 			} else {
 				ed->d_soid.nfactor = 0.66;
 			}
@@ -700,11 +702,17 @@ void Cohort::updateMonthly_Env(const int & yrcnt, const int & calyr,
 		// for some factors from other components
 		ed->d_vegd.btran = ground.getSoilTransFactor();
 
+        
+        
 		// calculate vegetation water dynamics
 		ve.updateDaily(daylength);
+        
+       
 		// ground/soil water dynamics
 		ground.updateDaily(yrcnt, calyr, currmind, id, tdrv, daylength, doy);
 
+       
+        
 		ground.soil.layer2structdaily(ground.fstsoill);
 		ground.soil.retrieveDailyOutputs(ground.fstsoill, ground.fstminl,
 				ground.lstminl, ground.backl);

@@ -7,7 +7,7 @@ Bucket::Bucket(){
 
 void Bucket::update(const double & trans, const double & evap, const double & rnth,
 				const double &  melt,double & runoff, double & infil,  Layer* fstsoill){
-		double bala = rnth +melt -evap -trans; 
+		double bala = rnth +melt -evap -trans;
 		double ice , liq, poro , dz ;
 		double ice2 , liq2, poro2 , dz2 ;
 		double infil2;

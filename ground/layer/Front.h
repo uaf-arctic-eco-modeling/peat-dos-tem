@@ -5,12 +5,17 @@
 class Front{
   public:
     Front();
-    int frzing; /*! whether is a freezing/thawing front */
-    double dz; /*! relative position to a layer */
-    //double z; /*! relative position to soil surface */
-
+    
+    /*! relative position to a layer */
+    double dz;	
+    /*! relative position to soil surface */		
+//	double z;
+	
     void setFrzing(const double & tsur, const double & tf);
 	void reset();
+	/*! whether is a freezing/thawing front */
+	int frzing;
+	
 	void assign(const Front & of);
 	void set(const double &dz, const int& frz);
 };

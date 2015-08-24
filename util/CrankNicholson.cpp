@@ -131,8 +131,7 @@ void CrankNicholson::cnBackward(const int & startind, const int & endind ,
 };
 
 /*! copy and modified from TridiagonalMod::Tridiagonal in CLM3*/
-void CrankNicholson::tridiagonal(const int ind, const int numsl, 
-		double a[], double b[], double c[], double r[], double u[]){
+void CrankNicholson::tridiagonal(const int ind, const int numsl, double a[], double b[], double c[], double r[], double u[]){
 	/* input: a, b, c
 	 * input: ind, numsl
 	 * output: u

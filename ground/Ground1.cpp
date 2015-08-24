@@ -51,6 +51,7 @@ Ground::~Ground() {
 void Ground::updateDaily(const int & yrcnt, const int & year, const int & mind,const int & id, const double & tdrv2, const double & dayl,const int & dayofyear) {
 	double tsurface;
 	double trans, melt, evap, rnth;
+//    double wtp = ed->d_soid.watertab;
 	curyrcnt = yrcnt;
 	curyear = year;
 	dtmax = 0.3;
@@ -65,6 +66,7 @@ void Ground::updateDaily(const int & yrcnt, const int & year, const int & mind,c
 	//frontl->tem;	
 	if (frontl->isSoil()) {
 		soil.updateDailySurfFlux(frontl, tsurface, dayl);
+        
 		ed->d_snw2a.solrad = 0.;
 		ed->d_snw2a.sublim = 0;
 	} else {
@@ -73,7 +75,7 @@ void Ground::updateDaily(const int & yrcnt, const int & year, const int & mind,c
 		ed->d_soi2a.solrad = 0.;
 	}
 
-	double tdrv1 = tdrv2 * ed->d_soid.nfactor;
+    double tdrv1 = tdrv2 * ed->d_soid.nfactor;
 
 	if (tdrv1 > 0) {
 		ed->d_snwd.melt += meltSnowLayers();
@@ -139,106 +141,92 @@ void Ground::updateDaily(const int & yrcnt, const int & year, const int & mind,c
 	soil.stefan.updateTemps(tdrv1, frontl, backl, fstsoill, fstfntl, lstfntl, curyear, dayofyear);
 
 	ed->d_soid.itnum = soil.stefan.itsumall;
-
 	// at end of the day, calculate the surface runoff and infiltration
 	// and then soil water dynamics at a daily time step
     
+
+    
     trans = ed->d_v2a.trans; //mm/day
-	evap = ed->d_soi2a.evap; //mm/day
-    
-//   trans = 0.0; //mm/day
-//  evap = 0.0;
-  
-    
-//	rnth = (ed->d_v2g.rthfl + ed->d_v2g.rdrip) + (1 - ed->y_vegd.vegfrac)* ed->d_a2l.rnfl; //mm/day
-  rnth = ed->d_a2l.rnfl;
+    evap = ed->d_soi2a.evap; //mm/day
+    rnth = (ed->d_v2g.rthfl + ed->d_v2g.rdrip) + (1 - ed->y_vegd.vegfrac)
+    * ed->d_a2l.rnfl; //mm/day
     //the first two items has already been adjust by ed->y_vegd.vegfrac in VE
-
-	melt = ed->d_snwd.melt; //mm/day
-
-	// soil.updateRunoffInfil(fstsoill, rnth, melt);
-	ed->d_soid.watertab = soil.getWaterTable(fstsoill, curyear, dayofyear);
-
-//    if(ed->d_soid.watertab>=0.05)
-//        ed->d_soid.watertab=0.05;
     
-	ed->d_soid.frasat = soil.getFracSat(ed->d_soid.frasat);
-
-	updateThermState();
-
-	if (richardl->frozen > -1) {//if the soil column is totally frozen
-		//	if(frontl->isSnow()){
-		//change to if there is snow
-		if (rnth + melt > 0) {
-			//double runoff = soil.getRunoffVIC(fstsoill, rnth, melt); //mm/day
-           double runoff = soil.getRunoff(fstsoill, rnth, melt,ed->d_soid.frasat); //mm/day
-
-           // double runoff = 0.0;
+    melt = ed->d_snwd.melt; //mm/day
+    
+    // soil.updateRunoffInfil(fstsoill, rnth, melt);
+    ed->d_soid.watertab = soil.getWaterTable(fstsoill, curyear, dayofyear);
+    ed->d_soid.frasat = soil.getFracSat(ed->d_soid.frasat);
+    
+    updateThermState();
+    
+    if (richardl->frozen > -1) {//if the soil column is totally frozen
+        //	if(frontl->isSnow()){
+        //change to if there is snow
+        if (rnth + melt > 0) {
+            //double runoff = soil.getRunoffVIC(fstsoill, rnth, melt); //mm/day
+            double runoff = soil.getRunoff(fstsoill, rnth, melt,
+                                           ed->d_soid.frasat); //mm/day
             
-			double infilf = rnth + melt - runoff; //mm/day
-			double leftinfil = soil.infilFrozen(fstminl, infilf);//mm/day
-
-			//soil.infilFrozen2( fstsoill, fstnoinfil, rnth, melt);
-
-			ed->d_l2soi.perc = infilf - leftinfil;//mm/day
-			ed->d_soi2l.qover = runoff + leftinfil;//mm/day
-
-			ed->d_l2soi.perc = rnth + melt;
-			ed->d_soi2l.qover = 0.0;
-		} else {
-			ed->d_soi2l.qover = 0.;//mm/day
-		}
-
-	} else {
-		if (rnth + melt > 0) {
-            //ed->d_soi2l.qover = soil.getRunoff(fstsoill, rnth, melt,ed->d_soid.frasat); //mm/day
-			//ed->d_l2soi.perc = (rnth + melt) - ed->d_soi2l.qover;//mm/day
-			ed->d_l2soi.perc = rnth + melt;
-		} else {
-			ed->d_soi2l.qover = 0.;
-			ed->d_l2soi.perc = 0.;
-		}
-
-		double infil = ed->d_l2soi.perc;
-		double sinday = 24. * 3600.;
- 
-    
-		trans /= sinday; // mm/day to mm/s
-		infil /= sinday; // mm/day to mm/s
-		evap /= sinday; // mm/day to mm/s
+            double infilf = rnth + melt - runoff; //mm/day
+            double leftinfil = soil.infilFrozen(fstminl, infilf);//mm/day
+            
+            //soil.infilFrozen2( fstsoill, fstnoinfil, rnth, melt);
+            
+            ed->d_l2soi.perc = infilf - leftinfil;//mm/day
+            ed->d_soi2l.qover = runoff + leftinfil;//mm/day
+            
+            ed->d_l2soi.perc = rnth + melt;
+            ed->d_soi2l.qover = 0.0;
+        } else {
+            ed->d_soi2l.qover = 0.;//mm/day
+        }
         
-		
- //       double drain = soil.getDrainage(ed->d_soid.watertab);
-        double drain=0.0;
-//
-//		if (ed->cd->drgtype == 1) //poorly drained site
-//			drain = 0.0;
-//		else
-//			drain /= sinday;
-//
-//    evap = 0.0;
-     
-//  trans = 0.0;
-  //    trans = trans*0.0;
+    } else {
+        if (rnth + melt > 0) {
+            ed->d_soi2l.qover = soil.getRunoff(fstsoill, rnth, melt,
+                                               ed->d_soid.frasat); //mm/day
+            //ed->d_l2soi.perc = (rnth + melt) - ed->d_soi2l.qover;//mm/day
+            ed->d_l2soi.perc = rnth + melt;
+        } else {
+            ed->d_soi2l.qover = 0.;
+            ed->d_l2soi.perc = 0.;
+        }
         
-  //      cout<<trans<<endl;
-
-		soil.richard.update(frontl, backl, fstsoill, drainl, drain, trans, evap, infil, ed->d_soid.watertab);
-
+        double infil = ed->d_l2soi.perc;
+        double sinday = 24. * 3600.;
         
-		// double permftab = soil.getPermafrostTable(fstsoill);
-
-		//  ed->d_soi2l.qdrain =soil.update5BaseFlow(drainl);
-
-		if (ed->cd->drgtype == 0) {
-			ed->d_soi2l.qdrain = soil.update5Drainage(drainl,ed->d_soid.frasat, ed->d_soid.watertab);
-		} else {
-			ed->d_soi2l.qdrain = 0;
-		}
-
-		ed->d_soid.itnumliq = soil.richard.itsum;
-
-	}
+        trans /= sinday; // mm/day to mm/s
+        infil /= sinday; // mm/day to mm/s
+        evap /= sinday; // mm/day to mm/s
+        
+        double watertab = soil.getWaterTable(frontl, 0, 0);
+        double drain = soil.getDrainage(watertab);
+        
+        if (ed->cd->drgtype == 1) //poorly drained site
+            drain = 0.0;
+        else
+            drain /= sinday;
+        
+        evap = 0.0;
+        
+        soil.richard.update(frontl, backl, fstsoill, drainl, drain, trans,
+                            evap, infil, ed->d_soid.watertab);
+        
+        // double permftab = soil.getPermafrostTable(fstsoill);
+        
+        //  ed->d_soi2l.qdrain =soil.update5BaseFlow(drainl);
+        
+        if (ed->cd->drgtype == 0) {
+            ed->d_soi2l.qdrain = soil.update5Drainage(drainl,
+                                                      ed->d_soid.frasat, ed->d_soid.watertab);
+        } else {
+            ed->d_soi2l.qdrain = 0;
+        }
+        
+        ed->d_soid.itnumliq = soil.richard.itsum;
+        
+    }
 
 	//at the end of water calculation, adjust water from fntl to nextl layer which is frozen or part frozen
 	//May 19, 2010 yis
@@ -1709,10 +1697,6 @@ void Ground::updateShlwThickness() {
             divideOneSoilLayerU2L(shlwsl, plnew11, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10], soil.peat.shlwdza[11]);
             insertAfter(plnew11, shlwsl);
             
-            PeatLayer* plnew10 = new PeatLayer(soil.peat.shlwdza[10], 1);
-            divideOneSoilLayerU2L(shlwsl, plnew10, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9], soil.peat.shlwdza[10]);
-            insertAfter(plnew10, shlwsl);
-            
             PeatLayer* plnew9 = new PeatLayer(soil.peat.shlwdza[9], 1);
             divideOneSoilLayerU2L(shlwsl, plnew9, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8], soil.peat.shlwdza[9]);
             insertAfter(plnew9, shlwsl);
@@ -1759,10 +1743,6 @@ void Ground::updateShlwThickness() {
             PeatLayer* plnew11 = new PeatLayer(soil.peat.shlwdza[11], 1);
             divideOneSoilLayerU2L(shlwsl, plnew11, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10], soil.peat.shlwdza[11]);
             insertAfter(plnew11, shlwsl);
-            
-            PeatLayer* plnew10 = new PeatLayer(soil.peat.shlwdza[10], 1);
-            divideOneSoilLayerU2L(shlwsl, plnew10, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9], soil.peat.shlwdza[10]);
-            insertAfter(plnew10, shlwsl);
             
             PeatLayer* plnew9 = new PeatLayer(soil.peat.shlwdza[9], 1);
             divideOneSoilLayerU2L(shlwsl, plnew9, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8], soil.peat.shlwdza[9]);
@@ -1814,11 +1794,6 @@ void Ground::updateShlwThickness() {
             PeatLayer* plnew11 = new PeatLayer(soil.peat.shlwdza[11], 1);
             divideOneSoilLayerU2L(shlwsl, plnew11, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10], soil.peat.shlwdza[11]);
             insertAfter(plnew11, shlwsl);
-            
-            PeatLayer* plnew10 = new PeatLayer(soil.peat.shlwdza[10], 1);
-            divideOneSoilLayerU2L(shlwsl, plnew10, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9], soil.peat.shlwdza[10]);
-            insertAfter(plnew10, shlwsl);
-            
             
             PeatLayer* plnew9 = new PeatLayer(soil.peat.shlwdza[9], 1);
             divideOneSoilLayerU2L(shlwsl, plnew9, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8], soil.peat.shlwdza[9]);
@@ -1874,11 +1849,6 @@ void Ground::updateShlwThickness() {
             PeatLayer* plnew11 = new PeatLayer(soil.peat.shlwdza[11], 1);
             divideOneSoilLayerU2L(shlwsl, plnew11, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10], soil.peat.shlwdza[11]);
             insertAfter(plnew11, shlwsl);
-            
-            
-            PeatLayer* plnew10 = new PeatLayer(soil.peat.shlwdza[10], 1);
-            divideOneSoilLayerU2L(shlwsl, plnew10, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9], soil.peat.shlwdza[10]);
-            insertAfter(plnew10, shlwsl);
             
             PeatLayer* plnew9 = new PeatLayer(soil.peat.shlwdza[9], 1);
             divideOneSoilLayerU2L(shlwsl, plnew9, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8], soil.peat.shlwdza[9]);
@@ -1938,12 +1908,6 @@ void Ground::updateShlwThickness() {
             PeatLayer* plnew11 = new PeatLayer(soil.peat.shlwdza[11], 1);
             divideOneSoilLayerU2L(shlwsl, plnew11, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10], soil.peat.shlwdza[11]);
             insertAfter(plnew11, shlwsl);
-            
-            
-            PeatLayer* plnew10 = new PeatLayer(soil.peat.shlwdza[10], 1);
-            divideOneSoilLayerU2L(shlwsl, plnew10, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9], soil.peat.shlwdza[10]);
-            insertAfter(plnew10, shlwsl);
-            
             
             PeatLayer* plnew9 = new PeatLayer(soil.peat.shlwdza[9], 1);
             divideOneSoilLayerU2L(shlwsl, plnew9, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8], soil.peat.shlwdza[9]);
@@ -2007,12 +1971,6 @@ void Ground::updateShlwThickness() {
             PeatLayer* plnew11 = new PeatLayer(soil.peat.shlwdza[11], 1);
             divideOneSoilLayerU2L(shlwsl, plnew11, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10], soil.peat.shlwdza[11]);
             insertAfter(plnew11, shlwsl);
-            
-            
-            PeatLayer* plnew10 = new PeatLayer(soil.peat.shlwdza[10], 1);
-            divideOneSoilLayerU2L(shlwsl, plnew10, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9], soil.peat.shlwdza[10]);
-            insertAfter(plnew10, shlwsl);
-            
             
             PeatLayer* plnew9 = new PeatLayer(soil.peat.shlwdza[9], 1);
             divideOneSoilLayerU2L(shlwsl, plnew9, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8], soil.peat.shlwdza[9]);
@@ -2080,11 +2038,6 @@ void Ground::updateShlwThickness() {
             PeatLayer* plnew11 = new PeatLayer(soil.peat.shlwdza[11], 1);
             divideOneSoilLayerU2L(shlwsl, plnew11, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10], soil.peat.shlwdza[11]);
             insertAfter(plnew11, shlwsl);
-            
-            
-            PeatLayer* plnew10 = new PeatLayer(soil.peat.shlwdza[10], 1);
-            divideOneSoilLayerU2L(shlwsl, plnew10, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9], soil.peat.shlwdza[10]);
-            insertAfter(plnew10, shlwsl);
             
             PeatLayer* plnew9 = new PeatLayer(soil.peat.shlwdza[9], 1);
             divideOneSoilLayerU2L(shlwsl, plnew9, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8], soil.peat.shlwdza[9]);
@@ -2156,11 +2109,6 @@ void Ground::updateShlwThickness() {
             PeatLayer* plnew11 = new PeatLayer(soil.peat.shlwdza[11], 1);
             divideOneSoilLayerU2L(shlwsl, plnew11, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10], soil.peat.shlwdza[11]);
             insertAfter(plnew11, shlwsl);
-            
-            
-            PeatLayer* plnew10 = new PeatLayer(soil.peat.shlwdza[10], 1);
-            divideOneSoilLayerU2L(shlwsl, plnew10, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9], soil.peat.shlwdza[10]);
-            insertAfter(plnew10, shlwsl);
             
             PeatLayer* plnew9 = new PeatLayer(soil.peat.shlwdza[9], 1);
             divideOneSoilLayerU2L(shlwsl, plnew9, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8], soil.peat.shlwdza[9]);
@@ -2236,11 +2184,6 @@ void Ground::updateShlwThickness() {
             PeatLayer* plnew11 = new PeatLayer(soil.peat.shlwdza[11], 1);
             divideOneSoilLayerU2L(shlwsl, plnew11, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9]+soil.peat.shlwdza[10], soil.peat.shlwdza[11]);
             insertAfter(plnew11, shlwsl);
-            
-            
-            PeatLayer* plnew10 = new PeatLayer(soil.peat.shlwdza[10], 1);
-            divideOneSoilLayerU2L(shlwsl, plnew10, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8]+soil.peat.shlwdza[9], soil.peat.shlwdza[10]);
-            insertAfter(plnew10, shlwsl);
             
             PeatLayer* plnew9 = new PeatLayer(soil.peat.shlwdza[9], 1);
             divideOneSoilLayerU2L(shlwsl, plnew9, soil.peat.shlwdza[0]+ soil.peat.shlwdza[1]+soil.peat.shlwdza[2]+soil.peat.shlwdza[3]+soil.peat.shlwdza[4]+soil.peat.shlwdza[5]+soil.peat.shlwdza[6]+soil.peat.shlwdza[7]+soil.peat.shlwdza[8], soil.peat.shlwdza[9]);
@@ -3132,8 +3075,7 @@ void Ground::updateDeepThickness() {
                                   soil.peat.deepdza[1]);
             insertAfter(plnew1, deepsl);
         }
-
-
+        
         else if (soil.peat.deepnum == 16) {
             SoilLayer* deepsl = dynamic_cast<SoilLayer*> (fstdeepl);
             
@@ -3145,7 +3087,7 @@ void Ground::updateDeepThickness() {
                                   + soil.peat.deepdza[7] + soil.peat.deepdza[8]+
                                   soil.peat.deepdza[9]+soil.peat.deepdza[10]+soil.peat.deepdza[11]+soil.peat.deepdza[12]+soil.peat.deepdza[13]+soil.peat.deepdza[14],soil.peat.deepdza[15]);
             insertAfter(plnew15, deepsl);
-            
+
             
             PeatLayer* plnew14 = new PeatLayer(soil.peat.deepdza[14], 0);
             divideOneSoilLayerU2L(deepsl, plnew14, soil.peat.deepdza[0]
@@ -3255,7 +3197,7 @@ void Ground::updateDeepThickness() {
                                   soil.peat.deepdza[1]);
             insertAfter(plnew1, deepsl);
         }
-        
+
         else if (soil.peat.deepnum == 17) {
             SoilLayer* deepsl = dynamic_cast<SoilLayer*> (fstdeepl);
             
@@ -3387,7 +3329,7 @@ void Ground::updateDeepThickness() {
             insertAfter(plnew1, deepsl);
         }
         
-        
+
         else if (soil.peat.deepnum == 18) {
             SoilLayer* deepsl = dynamic_cast<SoilLayer*> (fstdeepl);
             
@@ -3528,7 +3470,7 @@ void Ground::updateDeepThickness() {
             insertAfter(plnew1, deepsl);
         }
         
-        
+
         else if (soil.peat.deepnum == 19) {
             SoilLayer* deepsl = dynamic_cast<SoilLayer*> (fstdeepl);
             
@@ -3678,7 +3620,7 @@ void Ground::updateDeepThickness() {
             insertAfter(plnew1, deepsl);
         }
         
-        
+
         else if (soil.peat.deepnum == 20) {
             SoilLayer* deepsl = dynamic_cast<SoilLayer*> (fstdeepl);
             
@@ -3718,7 +3660,7 @@ void Ground::updateDeepThickness() {
                                   + soil.peat.deepdza[7] + soil.peat.deepdza[8]+
                                   soil.peat.deepdza[9]+soil.peat.deepdza[10]+soil.peat.deepdza[11]+soil.peat.deepdza[12]+soil.peat.deepdza[13]+soil.peat.deepdza[14]+soil.peat.deepdza[15],soil.peat.deepdza[16]);
             insertAfter(plnew16, deepsl);
-            
+
             
             PeatLayer* plnew15 = new PeatLayer(soil.peat.deepdza[15], 0);
             divideOneSoilLayerU2L(deepsl, plnew15, soil.peat.deepdza[0]
@@ -3839,7 +3781,7 @@ void Ground::updateDeepThickness() {
             insertAfter(plnew1, deepsl);
         }
         
-        
+
         else if (soil.peat.deepnum == 21) {
             
             SoilLayer* deepsl = dynamic_cast<SoilLayer*> (fstdeepl);
@@ -3853,7 +3795,7 @@ void Ground::updateDeepThickness() {
                                   soil.peat.deepdza[9]+soil.peat.deepdza[10]+soil.peat.deepdza[11]+soil.peat.deepdza[12]+soil.peat.deepdza[13]+soil.peat.deepdza[14]+soil.peat.deepdza[15]+soil.peat.deepdza[16]+soil.peat.deepdza[17]+soil.peat.deepdza[18]+soil.peat.deepdza[19],soil.peat.deepdza[20]);
             insertAfter(plnew20, deepsl);
             
-            
+
             
             PeatLayer* plnew19 = new PeatLayer(soil.peat.deepdza[19], 0);
             divideOneSoilLayerU2L(deepsl, plnew19, soil.peat.deepdza[0]
@@ -3891,7 +3833,7 @@ void Ground::updateDeepThickness() {
                                   + soil.peat.deepdza[7] + soil.peat.deepdza[8]+
                                   soil.peat.deepdza[9]+soil.peat.deepdza[10]+soil.peat.deepdza[11]+soil.peat.deepdza[12]+soil.peat.deepdza[13]+soil.peat.deepdza[14]+soil.peat.deepdza[15],soil.peat.deepdza[16]);
             insertAfter(plnew16, deepsl);
-            
+
             
             PeatLayer* plnew15 = new PeatLayer(soil.peat.deepdza[15], 0);
             divideOneSoilLayerU2L(deepsl, plnew15, soil.peat.deepdza[0]
@@ -4012,7 +3954,7 @@ void Ground::updateDeepThickness() {
             insertAfter(plnew1, deepsl);
         }
         
-        
+
         else if (soil.peat.deepnum == 22) {
             SoilLayer* deepsl = dynamic_cast<SoilLayer*> (fstdeepl);
             
@@ -4025,7 +3967,7 @@ void Ground::updateDeepThickness() {
                                   soil.peat.deepdza[9]+soil.peat.deepdza[10]+soil.peat.deepdza[11]+soil.peat.deepdza[12]+soil.peat.deepdza[13]+soil.peat.deepdza[14]+soil.peat.deepdza[15]+soil.peat.deepdza[16]+soil.peat.deepdza[17]+soil.peat.deepdza[18]+soil.peat.deepdza[19]+soil.peat.deepdza[20],soil.peat.deepdza[21]);
             insertAfter(plnew21, deepsl);
             
-            
+
             
             PeatLayer* plnew20 = new PeatLayer(soil.peat.deepdza[20], 0);
             divideOneSoilLayerU2L(deepsl, plnew20, soil.peat.deepdza[0]
@@ -4075,7 +4017,7 @@ void Ground::updateDeepThickness() {
                                   soil.peat.deepdza[9]+soil.peat.deepdza[10]+soil.peat.deepdza[11]+soil.peat.deepdza[12]+soil.peat.deepdza[13]+soil.peat.deepdza[14]+soil.peat.deepdza[15],soil.peat.deepdza[16]);
             insertAfter(plnew16, deepsl);
             
-            
+
             
             PeatLayer* plnew15 = new PeatLayer(soil.peat.deepdza[15], 0);
             divideOneSoilLayerU2L(deepsl, plnew15, soil.peat.deepdza[0]
@@ -4196,7 +4138,7 @@ void Ground::updateDeepThickness() {
             insertAfter(plnew1, deepsl);
         }
         
-        
+
         else if (soil.peat.deepnum == 23) {
             SoilLayer* deepsl = dynamic_cast<SoilLayer*> (fstdeepl);
             
@@ -4209,7 +4151,7 @@ void Ground::updateDeepThickness() {
                                   soil.peat.deepdza[9]+soil.peat.deepdza[10]+soil.peat.deepdza[11]+soil.peat.deepdza[12]+soil.peat.deepdza[13]+soil.peat.deepdza[14]+soil.peat.deepdza[15]+soil.peat.deepdza[16]+soil.peat.deepdza[17]+soil.peat.deepdza[18]+soil.peat.deepdza[19]+soil.peat.deepdza[20]+soil.peat.deepdza[21],soil.peat.deepdza[22]);
             insertAfter(plnew22, deepsl);
             
-            
+
             
             
             PeatLayer* plnew21 = new PeatLayer(soil.peat.deepdza[21], 0);
@@ -4272,7 +4214,7 @@ void Ground::updateDeepThickness() {
             insertAfter(plnew16, deepsl);
             
             
-            
+
             
             
             PeatLayer* plnew15 = new PeatLayer(soil.peat.deepdza[15], 0);
@@ -4394,7 +4336,7 @@ void Ground::updateDeepThickness() {
             insertAfter(plnew1, deepsl);
         }
         
-        
+
         else if (soil.peat.deepnum == 24) {
             SoilLayer* deepsl = dynamic_cast<SoilLayer*> (fstdeepl);
             
@@ -4407,7 +4349,7 @@ void Ground::updateDeepThickness() {
                                   soil.peat.deepdza[9]+soil.peat.deepdza[10]+soil.peat.deepdza[11]+soil.peat.deepdza[12]+soil.peat.deepdza[13]+soil.peat.deepdza[14]+soil.peat.deepdza[15]+soil.peat.deepdza[16]+soil.peat.deepdza[17]+soil.peat.deepdza[18]+soil.peat.deepdza[19]+soil.peat.deepdza[20]+soil.peat.deepdza[21]+soil.peat.deepdza[22],soil.peat.deepdza[23]);
             insertAfter(plnew23, deepsl);
             
-            
+
             
             PeatLayer* plnew22 = new PeatLayer(soil.peat.deepdza[22], 0);
             divideOneSoilLayerU2L(deepsl, plnew22, soil.peat.deepdza[0]
@@ -4479,7 +4421,7 @@ void Ground::updateDeepThickness() {
                                   + soil.peat.deepdza[7] + soil.peat.deepdza[8]+
                                   soil.peat.deepdza[9]+soil.peat.deepdza[10]+soil.peat.deepdza[11]+soil.peat.deepdza[12]+soil.peat.deepdza[13]+soil.peat.deepdza[14]+soil.peat.deepdza[15],soil.peat.deepdza[16]);
             insertAfter(plnew16, deepsl);
-            
+
             
             PeatLayer* plnew15 = new PeatLayer(soil.peat.deepdza[15], 0);
             divideOneSoilLayerU2L(deepsl, plnew15, soil.peat.deepdza[0]
@@ -4600,7 +4542,7 @@ void Ground::updateDeepThickness() {
             insertAfter(plnew1, deepsl);
         }
         
-        
+
         else if (soil.peat.deepnum == 25) {
             
             
@@ -4697,7 +4639,7 @@ void Ground::updateDeepThickness() {
                                   + soil.peat.deepdza[7] + soil.peat.deepdza[8]+
                                   soil.peat.deepdza[9]+soil.peat.deepdza[10]+soil.peat.deepdza[11]+soil.peat.deepdza[12]+soil.peat.deepdza[13]+soil.peat.deepdza[14]+soil.peat.deepdza[15],soil.peat.deepdza[16]);
             insertAfter(plnew16, deepsl);
-            
+
             
             PeatLayer* plnew15 = new PeatLayer(soil.peat.deepdza[15], 0);
             divideOneSoilLayerU2L(deepsl, plnew15, soil.peat.deepdza[0]
@@ -4818,7 +4760,7 @@ void Ground::updateDeepThickness() {
             insertAfter(plnew1, deepsl);
         }
         
-        
+
         else if (soil.peat.deepnum == 26) {
             SoilLayer* deepsl = dynamic_cast<SoilLayer*> (fstdeepl);
             
@@ -4830,7 +4772,7 @@ void Ground::updateDeepThickness() {
                                   + soil.peat.deepdza[7] + soil.peat.deepdza[8]+
                                   soil.peat.deepdza[9]+soil.peat.deepdza[10]+soil.peat.deepdza[11]+soil.peat.deepdza[12]+soil.peat.deepdza[13]+soil.peat.deepdza[14]+soil.peat.deepdza[15]+soil.peat.deepdza[16]+soil.peat.deepdza[17]+soil.peat.deepdza[18]+soil.peat.deepdza[19]+soil.peat.deepdza[20]+soil.peat.deepdza[21]+soil.peat.deepdza[22]+soil.peat.deepdza[23]+soil.peat.deepdza[24],soil.peat.deepdza[25]);
             insertAfter(plnew25, deepsl);
-            
+
             
             PeatLayer* plnew24 = new PeatLayer(soil.peat.deepdza[24], 0);
             divideOneSoilLayerU2L(deepsl, plnew24, soil.peat.deepdza[0]
@@ -4923,7 +4865,7 @@ void Ground::updateDeepThickness() {
                                   soil.peat.deepdza[9]+soil.peat.deepdza[10]+soil.peat.deepdza[11]+soil.peat.deepdza[12]+soil.peat.deepdza[13]+soil.peat.deepdza[14]+soil.peat.deepdza[15],soil.peat.deepdza[16]);
             insertAfter(plnew16, deepsl);
             
-            
+
             
             PeatLayer* plnew15 = new PeatLayer(soil.peat.deepdza[15], 0);
             divideOneSoilLayerU2L(deepsl, plnew15, soil.peat.deepdza[0]
@@ -5044,7 +4986,7 @@ void Ground::updateDeepThickness() {
             insertAfter(plnew1, deepsl);
         }
         
-        
+
         else if (soil.peat.deepnum == 27) {
             
             SoilLayer* deepsl = dynamic_cast<SoilLayer*> (fstdeepl);
@@ -5058,7 +5000,7 @@ void Ground::updateDeepThickness() {
                                   soil.peat.deepdza[9]+soil.peat.deepdza[10]+soil.peat.deepdza[11]+soil.peat.deepdza[12]+soil.peat.deepdza[13]+soil.peat.deepdza[14]+soil.peat.deepdza[15]+soil.peat.deepdza[16]+soil.peat.deepdza[17]+soil.peat.deepdza[18]+soil.peat.deepdza[19]+soil.peat.deepdza[20]+soil.peat.deepdza[21]+soil.peat.deepdza[22]+soil.peat.deepdza[23]+soil.peat.deepdza[24]+soil.peat.deepdza[25],soil.peat.deepdza[26]);
             insertAfter(plnew26, deepsl);
             
-            
+
             
             PeatLayer* plnew25 = new PeatLayer(soil.peat.deepdza[25], 0);
             divideOneSoilLayerU2L(deepsl, plnew25, soil.peat.deepdza[0]
@@ -5160,7 +5102,7 @@ void Ground::updateDeepThickness() {
                                   + soil.peat.deepdza[7] + soil.peat.deepdza[8]+
                                   soil.peat.deepdza[9]+soil.peat.deepdza[10]+soil.peat.deepdza[11]+soil.peat.deepdza[12]+soil.peat.deepdza[13]+soil.peat.deepdza[14]+soil.peat.deepdza[15],soil.peat.deepdza[16]);
             insertAfter(plnew16, deepsl);
-            
+
             
             PeatLayer* plnew15 = new PeatLayer(soil.peat.deepdza[15], 0);
             divideOneSoilLayerU2L(deepsl, plnew15, soil.peat.deepdza[0]
@@ -5281,7 +5223,7 @@ void Ground::updateDeepThickness() {
             insertAfter(plnew1, deepsl);
         }
         
-        
+
         else if (soil.peat.deepnum == 28) {
             SoilLayer* deepsl = dynamic_cast<SoilLayer*> (fstdeepl);
             
@@ -5304,7 +5246,7 @@ void Ground::updateDeepThickness() {
                                   + soil.peat.deepdza[7] + soil.peat.deepdza[8]+
                                   soil.peat.deepdza[9]+soil.peat.deepdza[10]+soil.peat.deepdza[11]+soil.peat.deepdza[12]+soil.peat.deepdza[13]+soil.peat.deepdza[14]+soil.peat.deepdza[15]+soil.peat.deepdza[16]+soil.peat.deepdza[17]+soil.peat.deepdza[18]+soil.peat.deepdza[19]+soil.peat.deepdza[20]+soil.peat.deepdza[21]+soil.peat.deepdza[22]+soil.peat.deepdza[23]+soil.peat.deepdza[24]+soil.peat.deepdza[25],soil.peat.deepdza[26]);
             insertAfter(plnew26, deepsl);
-            
+
             
             PeatLayer* plnew25 = new PeatLayer(soil.peat.deepdza[25], 0);
             divideOneSoilLayerU2L(deepsl, plnew25, soil.peat.deepdza[0]
@@ -5406,7 +5348,7 @@ void Ground::updateDeepThickness() {
                                   + soil.peat.deepdza[7] + soil.peat.deepdza[8]+
                                   soil.peat.deepdza[9]+soil.peat.deepdza[10]+soil.peat.deepdza[11]+soil.peat.deepdza[12]+soil.peat.deepdza[13]+soil.peat.deepdza[14]+soil.peat.deepdza[15],soil.peat.deepdza[16]);
             insertAfter(plnew16, deepsl);
-            
+
             
             PeatLayer* plnew15 = new PeatLayer(soil.peat.deepdza[15], 0);
             divideOneSoilLayerU2L(deepsl, plnew15, soil.peat.deepdza[0]
@@ -5527,7 +5469,7 @@ void Ground::updateDeepThickness() {
             insertAfter(plnew1, deepsl);
         }
         
-        
+
         else if (soil.peat.deepnum == 29) {
             SoilLayer* deepsl = dynamic_cast<SoilLayer*> (fstdeepl);
             
@@ -5550,7 +5492,7 @@ void Ground::updateDeepThickness() {
                                   soil.peat.deepdza[9]+soil.peat.deepdza[10]+soil.peat.deepdza[11]+soil.peat.deepdza[12]+soil.peat.deepdza[13]+soil.peat.deepdza[14]+soil.peat.deepdza[15]+soil.peat.deepdza[16]+soil.peat.deepdza[17]+soil.peat.deepdza[18]+soil.peat.deepdza[19]+soil.peat.deepdza[20]+soil.peat.deepdza[21]+soil.peat.deepdza[22]+soil.peat.deepdza[23]+soil.peat.deepdza[24]+soil.peat.deepdza[25]+soil.peat.deepdza[26],soil.peat.deepdza[27]);
             insertAfter(plnew27, deepsl);
             
-            
+
             
             PeatLayer* plnew26 = new PeatLayer(soil.peat.deepdza[26], 0);
             divideOneSoilLayerU2L(deepsl, plnew26, soil.peat.deepdza[0]
@@ -5561,7 +5503,7 @@ void Ground::updateDeepThickness() {
                                   soil.peat.deepdza[9]+soil.peat.deepdza[10]+soil.peat.deepdza[11]+soil.peat.deepdza[12]+soil.peat.deepdza[13]+soil.peat.deepdza[14]+soil.peat.deepdza[15]+soil.peat.deepdza[16]+soil.peat.deepdza[17]+soil.peat.deepdza[18]+soil.peat.deepdza[19]+soil.peat.deepdza[20]+soil.peat.deepdza[21]+soil.peat.deepdza[22]+soil.peat.deepdza[23]+soil.peat.deepdza[24]+soil.peat.deepdza[25],soil.peat.deepdza[26]);
             insertAfter(plnew26, deepsl);
             
-            
+
             
             
             PeatLayer* plnew25 = new PeatLayer(soil.peat.deepdza[25], 0);
@@ -5664,7 +5606,7 @@ void Ground::updateDeepThickness() {
                                   + soil.peat.deepdza[7] + soil.peat.deepdza[8]+
                                   soil.peat.deepdza[9]+soil.peat.deepdza[10]+soil.peat.deepdza[11]+soil.peat.deepdza[12]+soil.peat.deepdza[13]+soil.peat.deepdza[14]+soil.peat.deepdza[15],soil.peat.deepdza[16]);
             insertAfter(plnew16, deepsl);
-            
+
             
             PeatLayer* plnew15 = new PeatLayer(soil.peat.deepdza[15], 0);
             divideOneSoilLayerU2L(deepsl, plnew15, soil.peat.deepdza[0]
@@ -5785,7 +5727,7 @@ void Ground::updateDeepThickness() {
             insertAfter(plnew1, deepsl);
         }
         
-        
+
         else if (soil.peat.deepnum == 30) {
             SoilLayer* deepsl = dynamic_cast<SoilLayer*> (fstdeepl);
             
@@ -5929,7 +5871,7 @@ void Ground::updateDeepThickness() {
                                   + soil.peat.deepdza[7] + soil.peat.deepdza[8]+
                                   soil.peat.deepdza[9]+soil.peat.deepdza[10]+soil.peat.deepdza[11]+soil.peat.deepdza[12]+soil.peat.deepdza[13]+soil.peat.deepdza[14]+soil.peat.deepdza[15],soil.peat.deepdza[16]);
             insertAfter(plnew16, deepsl);
-            
+
             
             PeatLayer* plnew15 = new PeatLayer(soil.peat.deepdza[15], 0);
             divideOneSoilLayerU2L(deepsl, plnew15, soil.peat.deepdza[0]
@@ -6051,32 +5993,31 @@ void Ground::updateDeepThickness() {
         }
         
         
-        
-        
-        
-    } else {
-        soil.peat.olddeepthick = soil.peat.deepthick;
-        soil.peat.deepthick = thick;
-        
-        //need to change the front in a layer so that the frontdz should not be greater than the layer thickness
-        currl = fstdeepl;
-        SoilLayer* sl;
-        while (currl != NULL) {
-            
-            if (currl->indl <= lstdeepl->indl) {
-                sl = dynamic_cast<SoilLayer*> (currl);
-                sl->adjustFronts();
-            } else {
-                break;
-            }
-            currl = currl->nextl;
-        }
-        
-    }
-    
+
+
+
+	} else {
+		soil.peat.olddeepthick = soil.peat.deepthick;
+		soil.peat.deepthick = thick;
+
+		//need to change the front in a layer so that the frontdz should not be greater than the layer thickness
+		currl = fstdeepl;
+		SoilLayer* sl;
+		while (currl != NULL) {
+
+			if (currl->indl <= lstdeepl->indl) {
+				sl = dynamic_cast<SoilLayer*> (currl);
+				sl->adjustFronts();
+			} else {
+				break;
+			}
+			currl = currl->nextl;
+		}
+
+	}
+
 }
 ;
-
 
 void Ground::adjustLayerThickness(const double & mossthick) {
 

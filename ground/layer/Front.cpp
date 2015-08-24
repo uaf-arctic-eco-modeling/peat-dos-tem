@@ -7,6 +7,7 @@ Front::Front(){
 	reset();
 };
 
+
 void Front::reset(){
 	dz =-999.; //initialize one with minus value;
 	frzing=0;  //+1 freezing, -1 thawing, and 0 is initial value
