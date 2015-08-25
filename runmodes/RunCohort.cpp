@@ -460,7 +460,7 @@ void RunCohort::runEquilibrium() {
     
     
 //	for (int iy = 0; iy < (nfri + 1) * cht.fd->gd->fri - 2; iy++) { //Yuan: -2 will make the final restart.nc not the fire year, but two years ago
-	for (int iy = 0; iy < 1500 - 2; iy++) {
+	for (int iy = 0; iy < 1000 - 2; iy++) {
 		int yrcnt = iy;
 		for (int im = 0; im < 12; im++) {
 			int currmind = im;

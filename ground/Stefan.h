@@ -21,8 +21,8 @@
 #undef RAISED
 #endif
 
-//#define SOITDATA
-#define SOITDATABETASE
+#define SOITDATA
+//#define SOITDATABETASE
 //#define SOITDATAGAMMA
 
 #include "../inc/PhysicalConstants.h"

@@ -650,7 +650,7 @@ void Cohort::updateMonthly_Env(const int & yrcnt, const int & calyr,const int & 
 
 		if (cd->vegtype == 0) {
 //			if (ed->d_soid.watertab > 0.03)
-            ed->d_soid.nfactor = 0.75;// tundra Y.Mi
+            ed->d_soid.nfactor = 1.0;// tundra Y.Mi
 //			else
 //				ed->d_soid.nfactor = 1;
 		} else if (cd->vegtype == 1) { //aspen

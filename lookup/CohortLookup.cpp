@@ -140,11 +140,13 @@ void CohortLookup::assignVegetationParams(){
 	//shuhua Oct. 7, 2008
 	float dumfpcmax[] = {1.00, 1.00, 1.00, 1.00};  //yuan
     float duminitleafmx[] = {1, 1, 1,  1};
-	float dumc2nmin[] = {55.91, 229.13, 295.08, 216.67 };//be carefull about these two
-	float dumcnmin[] = {0, 0, 0,  0};
-
-	float dumc2na[] = {0, 0, 0,  0 };  // c2nmin = c2nb
-	float dumc2nb[] = {55.91, 229.13, 295.08, 216.67};  //Yuan: modified
+    	float dumc2nmin[] = {55.91, 229.13, 295.08, 216.67 };//be carefull about these two
+   // float dumc2nmin[] = {16.89, 229.13, 295.08, 216.67 };
+    float dumcnmin[] = {0, 0, 0,  0};
+    
+    float dumc2na[] = {0, 0, 0,  0 };  // c2nmin = c2nb
+    	float dumc2nb[] = {55.91, 229.13, 295.08, 216.67};  //Yuan: modified
+	//float dumc2nb[] = {35.16, 229.13, 295.08, 216.67};  //Yuan: modified
 	float dumabv2totmass[] = { 0.60, 0.70, 0.81,  0.8};     //yuan: modified
 
    	float duminitcneven[] = {123.06, 27.66, 164.3,  68.08}; //yuan: modified
@@ -463,7 +465,7 @@ void CohortLookup::assignRootParams(){
 
 void CohortLookup::assignSOCParams(){
 
-  	float dum_maxmossthick[] = {0.015, 0.0, 0.035, 0.035};
+  	float dum_maxmossthick[] = {0.015, 0.0, 0.035, 0.035}; //{0.015, 0.0, 0.035, 0.035};
   	float dum_abvltrr2t[] = {0.5, 0.650,0.705, 0.431};
   	float dum_blwltrr2t[] = {0.5, 0.350,0.295, 0.569};// from floodplain black spruce and white spruce
 
@@ -477,7 +479,7 @@ void CohortLookup::assignSOCParams(){
 
 void CohortLookup::assignSoilTextureParams(){
 
- 	float dum_mossthick[MAX_DRG_TYPE][MAX_VEG_TYPE] =  {{0.0, 0.0, 0.035,  0.035 },{0.0, 0.0, 0.025,  0.035 }};
+ 	float dum_mossthick[MAX_DRG_TYPE][MAX_VEG_TYPE] =  {{0.0, 0.0, 0.035,  0.035 },{0.0, 0.0, 0.025,  0.035 }}; //{{0.0, 0.0, 0.035,  0.035 },{0.0, 0.0, 0.025,  0.035 }};
  	float dum_fibthick[MAX_DRG_TYPE][MAX_VEG_TYPE] =  {{0.03, 0.050, 0.050,  0.050},{0.03, 0.05, 0.09,  0.20 }};
  	float dum_humthick[MAX_DRG_TYPE][MAX_VEG_TYPE] =  {{0.93, 0.05, 0.050,  0.095},{0.93, 0.10, 0.10,  0.16 }};
 
