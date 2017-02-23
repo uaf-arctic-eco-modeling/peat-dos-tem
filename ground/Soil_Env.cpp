@@ -135,7 +135,6 @@ double Soil_Env::getEvaporation(const double & tsurf, const double & dayl,
 		evap *= ratio;
 	}
 
- //   evap *= 0.001; //Y.Mi
     
 	return evap;
 }
@@ -529,8 +528,8 @@ double Soil_Env::getWaterTable(Layer* fstsoill, const int year, const int doy) {
     ztot = 0.0;
     double wtthr = 0.35;
     
-    if (ed->cd->drgtype == 0) {// Bug? 0 for well drained site, Y.Mi
-        //        if (ed->cd->drgtype == 1) {
+//    if (ed->cd->drgtype == 0) {// Bug? 0 for well drained site, Y.Mi
+        if (ed->cd->drgtype == 1) {
         while (currl != NULL) {
             if (currl->isRock())
                 break;
@@ -549,8 +548,6 @@ double Soil_Env::getWaterTable(Layer* fstsoill, const int year, const int doy) {
                 if (wtd < wtthr)
                     wtd = wtd - hrise;
                 
-                //             if (wtd < 0.0)
-                //				wtd = 0.01;
                 
                 break;
             } else {
@@ -561,7 +558,9 @@ double Soil_Env::getWaterTable(Layer* fstsoill, const int year, const int doy) {
         }
     }
     
-#ifdef WTDATA
+    wtd = wtd*0.1;
+    
+#ifdef WTDATA // Y.Mi
     if (year == 2011) {
         if (doy >= 153 && doy <= 263) {
             int index = doy - 153;

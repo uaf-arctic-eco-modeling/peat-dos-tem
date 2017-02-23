@@ -27,7 +27,7 @@ void Atmosphere::prepareMonthDrivingData() {
 	//ta degC, prec mm/mon, nirr w/m2, vap mbar,
 	for (int iy = 0; iy < MAX_ATM_DRV_YR; iy++) {
 		for (int im = 0; im < 12; im++) {
-			ta[iy][im] = ed->gd->ta[iy][im];
+			ta[iy][im] = ed->gd->ta[iy][im]; 
 			prec[iy][im] = ed->gd->prec[iy][im];
 			nirr[iy][im] = ed->gd->nirr[iy][im];
 			vap[iy][im] = ed->gd->vap[iy][im];

@@ -21,9 +21,9 @@
 #undef RAISED
 #endif
 
-#define SOITDATA
-//#define SOITDATABETASE
-//#define SOITDATAGAMMA
+//#define SOITDATA
+//#define SOITDATABETASE //beta SE site soil temperature
+//#define SOITDATAGAMMA //gamma (forest) site soil temperature
 
 #include "../inc/PhysicalConstants.h"
 
@@ -34,10 +34,10 @@
 #include "../util/Exception.h"
 
 //const double soildepth[5] = { 0.0, 0.02, 0.1, 0.25, 0.5 };
-const double soildepth[5] = {0.02, 0.05, 0.1, 0.25, 0.5};
+const double soildepth[5] = {0.02, 0.05, 0.1, 0.25, 0.5}; //Y.MI
 
-const double soildepthbetase[7] = {0.02, 0.05, 0.1, 0.25, 0.5,1.0,1.7};
-const double soildepthgamma[7] = {0.02, 0.05, 0.1, 0.25, 0.5,1.0,2.0};
+const double soildepthbetase[7] = {0.02, 0.05, 0.1, 0.25, 0.5,1.0,1.7};//Y.MI
+const double soildepthgamma[7] = {0.02, 0.05, 0.1, 0.25, 0.5,1.0,2.0};//Y.MI
 
 const double temp2009[224][5] ={{11.73
     ,9.45

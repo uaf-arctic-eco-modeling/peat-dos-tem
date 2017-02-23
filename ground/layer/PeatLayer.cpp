@@ -14,7 +14,7 @@ PeatLayer::PeatLayer(const double & pdz, const int & upper){
 // these properties will not change upon fire disturbance
 // it is assumed that when fire occurs, the left moss will
 // be converted to deep organic type
-    tcsolid = 0.20;
+    tcsolid = 0.25;
     // kg/m3, from ATBalland22005a
 	
 	//psisat = -120; // mm
@@ -34,8 +34,6 @@ PeatLayer::PeatLayer(const double & pdz, const int & upper){
    		albdryvis = 0.15;
    		albdrynir = 0.3;
         
-    //    tcsolid = 0.125;
-
         prtlden = 1.51e3;//Y.Mi 1.3e3 ;
         
    		hksat = 0.28;  
@@ -55,8 +53,6 @@ PeatLayer::PeatLayer(const double & pdz, const int & upper){
         prtlden = 1.6e3;//Y.Mi 1.3e3 ;
        	bulkden = 155;// Y.Mi 176000; // g/m3
    	  	cfrac = 35.2; // %
-  
-        tcsolid = 0.25;
         
    		bsw=8;
    		hksat =0.002;
@@ -81,7 +77,6 @@ void PeatLayer::humify(){
     prtlden = 1.6e3;//Y.Mi 1.3e3 ;
     bulkden = 155;// Y.Mi 176000; // g/m3
     
- 
    	
    		//bsw = 6.1;//4.0; //
    	 	hksat = 0.02;//0.1;//0.28; //mm/s

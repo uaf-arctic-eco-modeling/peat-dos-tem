@@ -103,17 +103,17 @@ void SnowLayer::updateThick(){
 	 
 
 	 double SnowLayer::getFrzVolHeatCapa(){
-	 
-  //        double vhc = SHCICE * ice;///dz; Y.Mi unit of SHCICE is J kg-1
-         double vhc = 2.5e6;//300 * SHCSNOW;
+
+   //      double vhc = SHCICE * ice;///dz; Y.Mi unit of SHCICE is J kg-1
+         double vhc = 300 * SHCSNOW;
          
        //  cout << vhc<<"f" <<endl;
 	 	return vhc;
 	 };
 
 	 double SnowLayer::getUnfVolHeatCapa(){
-	   //double vhc = SHCICE * ice;///dz; Y.Mi unit of SHCICE is J kg-1
-	 	double vhc = 300 * SHCSNOW;
+//	  double vhc = SHCICE * ice;///dz; Y.Mi unit of SHCICE is J kg-1
+	 double vhc =  300 * SHCSNOW;
          
       //   cout << vhc <<endl;
          

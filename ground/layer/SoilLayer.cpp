@@ -145,16 +145,15 @@ double SoilLayer::getFrozenFraction(){
 	// get frozen layer specific heat capcity
 	 double SoilLayer::getFrzVolHeatCapa(){
 //	   double vhc = vhcsolid * (1-poro) + (liq+ice)/dz *SHCICE;
-	   double vhc = vhcsolid   + ice *SHCICE/dz  + liq *SHCLIQ/dz;	//Yuan: bug here??//Y.Mi, the heat capacity unit of the first part is J m-3, while the second part is J kg-1
+	   double vhc = vhcsolid* (1-poro)  + ice *SHCICE/dz  + liq *SHCLIQ/dz;	//Yuan: bug here??//Y.Mi, the heat capacity unit of the first part is J m-3, while the second part is J kg-1
 	 	
-//         cout << vhc<<"f" <<endl;
          
          return vhc;
 	 };
 
 	 double SoilLayer::getUnfVolHeatCapa(){
 //	   double vhc= vhcsolid * (1-poro) + (liq+ice)/dz *SHCLIQ;
-	   double vhc = vhcsolid  + liq *SHCLIQ/dz ;	//Yuan: bug here??
+	   double vhc = vhcsolid* (1-poro)  + liq *SHCLIQ/dz ;	//Yuan: bug here??
          
 //         cout << vhc<<endl;
 	 	return vhc;
@@ -178,18 +177,15 @@ double SoilLayer::getFrozenFraction(){
           }
           
            if (isMineral()) {
-	  	 //tc = ke *tcsatfrz + (1-ke)*tcdry;
-              tc = ke *tcsatfrz + (1-ke)*tcsolid;
+	  	      tc = ke *tcsatfrz + (1-ke)*tcdry;
+              
           }
           
           else {
-             // tc = tcdry * pow(tcsatfrz/tcdry, s); //Y.Mi
-              tc = tcsolid* pow(tcsatfrz/tcsolid, s);
+              tc = tcdry * pow(tcsatfrz/tcdry, s); //Y.Mi, tc for peat, calculated based on Balland and Arp, 2005
               
-             
           }
 	  }
-  	//	tc = max(tc, mintc);
 	  
 	  return tc;
 };
@@ -213,22 +209,19 @@ double SoilLayer::getUnfThermCond(){
         
         if (isMineral()) {
            
-           // tc = ke *tcsatunf + (1-ke)*tcdry;
-            tc = ke *tcsatunf + (1-ke)*tcsolid;
+            tc = ke *tcsatunf + (1-ke)*tcdry;
+         
             
         }
         
         else {
-         // tc = (tcsatunf-tcdry)* s * s + tcdry; //Y.Mi
-            tc =  tcsolid+(tcsatunf-tcsolid)* s * s;
+         tc = (tcsatunf-tcdry)* s * s + tcdry;  //Y.Mi, tc for peat, calculated based on Balland and Arp, 2005
+            
         }
             
 	  	 
   	}
-	  	//if(tc<tcmin){
-	  	 //cout <<"tc is less " <<tc <<"\n";
-	  	//}
-	  //	if(poro>0.9 || (poro>=0.8 &&solind ==1)){
+
   	if(poro>=0.9 || (poro>=0.8 &&solind ==1)){
 	  	tc = max(tc, tcmin);
   	}

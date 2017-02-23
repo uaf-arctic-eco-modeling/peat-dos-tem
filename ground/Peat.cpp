@@ -124,7 +124,7 @@ bool Peat::sameDeepThickRange(const double & thickness) {
 		newdeepnum = 8;
 	else if (thickness > 8 * dlstshlw && thickness <= 9 * dlstshlw)
 		newdeepnum = 9;
-    else if (thickness > 9 * dlstshlw && thickness <= 10 * dlstshlw) //Y.Mi
+    else if (thickness > 9 * dlstshlw && thickness <= 10 * dlstshlw) //Y.Mi, increase number of layers
         newdeepnum = 10;
     else if (thickness > 10 * dlstshlw && thickness <= 11 * dlstshlw)
         newdeepnum = 11;
@@ -250,7 +250,7 @@ void Peat::initShlwThicknesses(const double & thickness) {
    
     shlwnum = 1;
     
-    if (thickness == 0.03) { //Yuan: always allow at least ONE shlwnum
+    if (thickness == 0.03) { //Yuan: always allow at least ONE shlwnum //Y.Mi, increase number of layers
         shlwdza[0] = 0.03;
         shlwdza[1] = -1;
         shlwdza[2] = -1;

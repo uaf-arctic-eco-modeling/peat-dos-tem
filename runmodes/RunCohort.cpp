@@ -453,14 +453,14 @@ void RunCohort::runEquilibrium() {
 	cht.friderived = true; //When call DSB module (fire), using FRI to determine fire year
 	// and the fire season/size use the FIRST one in the gd.season[]/gd.size[]
 	int outputyrind = 0;
-//	int nfri = min((int) (MAX_EQ_YR / cht.fd->gd->fri), 20); //max. 10000 yr or 20 FRI
+	int nfri = min((int) (MAX_EQ_YR / cht.fd->gd->fri), 20); //max. 10000 yr or 20 FRI
 
     
 
     
     
 //	for (int iy = 0; iy < (nfri + 1) * cht.fd->gd->fri - 2; iy++) { //Yuan: -2 will make the final restart.nc not the fire year, but two years ago
-	for (int iy = 0; iy < 1000 - 2; iy++) {
+    for (int iy = 0; iy < 800; iy++){
 		int yrcnt = iy;
 		for (int im = 0; im < 12; im++) {
 			int currmind = im;

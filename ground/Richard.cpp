@@ -345,12 +345,12 @@ int Richard::updateOneIteration(Layer *fstsoill, const double & trans,const doub
 
 	// for first layer
 	ind = 1;
-    double qtrans = trans;//*dt; //Y.Mi
+    double qtrans = trans*dt; //Y.Mi, *dt, as the unit of trans is s
 	double den, num;
 	double dqodw1, dqodw2, dqidw0, dqidw1;
 	double sdamp = 0.;
 
-    qin[ind] = (infil - evap);//*dt; //Y.Mi
+    qin[ind] = (infil - evap)*dt; //Y.Mi
     
 	den = zmm[ind + 1] - zmm[ind];
 	num = smp[ind + 1] - smp[ind] - den;

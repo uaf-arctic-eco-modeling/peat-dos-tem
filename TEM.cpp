@@ -100,8 +100,8 @@ int main(int argc, char* argv[]) {
 				mfile << "config/" << endl;
 				mfile << "eq" << endl;
 				mfile << "lookup" << endl;
-                mfile<<"normal"<<endl; //climate, dynamic or normal
-                mfile<<"initial"<<endl; //CO2, dynamic or initial
+                mfile<<"normal"<<endl; //climate, dynamic or normal, Y.Mi
+                mfile<<"initial"<<endl; //CO2, dynamic or initial, Y.Mi
 				mfile << "Test-TEM-GUI" << endl;
 				mfile.close();
 			} else {
@@ -120,8 +120,8 @@ int main(int argc, char* argv[]) {
 				mfile<<"config/"<<endl;
 				mfile<<"sp"<<endl;
 				mfile<<"restart"<<endl;
-                mfile<<"normal"<<endl; //climate, dynamic or normal
-                mfile<<"initial"<<endl; //CO2, dynamic or initial
+                mfile<<"normal"<<endl; //climate, dynamic or normal, Y.Mi
+                mfile<<"initial"<<endl; //CO2, dynamic or initial, Y.Mi
 				mfile<<"Test-TEM-GUI"<<endl;
 				mfile.close();
 			} else {

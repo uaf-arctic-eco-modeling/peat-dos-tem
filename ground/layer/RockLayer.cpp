@@ -18,7 +18,7 @@ void RockLayer::updateProperty(){
     	tcsolid =25;//
   	    tcsatunf= tcsolid;
   	    tcsatfrz= tcsolid;
-   	    vhcsolid = 2.0e6; //2.7;bulkdensity 2700, porosity 0, //specific heat capacity 1000 J/kgk
+   	    vhcsolid = 2.7e6; //bulkdensity 2700, porosity 0, //specific heat capacity 1000 J/kgk
 };
 
 // get frozen layer specific heat capcity

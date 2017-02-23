@@ -290,7 +290,7 @@ void Vegetation_Env::updateDaily(   const double & dayl){
 	   //  ed->d_v2g.sw =  nirr;   ///?? nirr or girr
 	    	
 	}
-	 //
+	 
 
 	ed->d_v2a.sublim *= ed->y_vegd.vegfrac;
 	ed->d_v2a.trans *= ed->y_vegd.vegfrac;
@@ -300,9 +300,6 @@ void Vegetation_Env::updateDaily(   const double & dayl){
     ed->d_v2g.sthfl *= ed->y_vegd.vegfrac ;
     
 
-    
-//    ed->d_v2a.trans *= 0.015; //Y.Mi
-//    ed->d_v2a.evapo *= 0.0075;
 	
 }
 
@@ -334,7 +331,7 @@ double Vegetation_Env::getPenMonET(const double & ta, const double& vpd, const d
 		/*slope of pvs vs. T curve at T*/
 		double slope = (pvs1-pvs2)/(t1-t2);	
 		/*evapotranspiration*/
-		et = (slope*irad+ rho*CP *vpd/rhr)/((pa * CP *rv)/(lhvap*EPS *rhr)+slope); //Y.MI
+		et = (slope*irad+ rho*CP *vpd/rhr)/((pa * CP *rv)/(lhvap*EPS *rhr)+slope); 
 		return et/lhvap;		
 }
 

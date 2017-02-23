@@ -732,13 +732,13 @@ void Stefan::updateTemps(const double & tdrv, Layer *frontl, Layer *backl,
                 } else {
                     
                     if (year == 2009) {
-                        deptharray[0] = tempbetase2009[doy - 141][0];
-                        deptharray[1] = tempbetase2009[doy - 141][1];
-                        deptharray[2] = tempbetase2009[doy - 141][2];
-                        deptharray[3] = tempbetase2009[doy - 141][3];
-                        deptharray[4] = tempbetase2009[doy - 141][4];
-                        deptharray[5] = tempbetase2009[doy - 141][5];
-                        deptharray[6] = tempbetase2009[doy - 141][6];
+                        deptharray[0] = tempbetase2009[doy - 272][0];
+                        deptharray[1] = tempbetase2009[doy - 272][1];
+                        deptharray[2] = tempbetase2009[doy - 272][2];
+                        deptharray[3] = tempbetase2009[doy - 272][3];
+                        deptharray[4] = tempbetase2009[doy - 272][4];
+                        deptharray[5] = tempbetase2009[doy - 272][5];
+                        deptharray[6] = tempbetase2009[doy - 272][6];
                     }
                     
                     if (year == 2010) {

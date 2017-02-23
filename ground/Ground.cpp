@@ -217,9 +217,10 @@ void Ground::updateDaily(const int & yrcnt, const int & year, const int & mind,c
 //			drain /= sinday;
 //
 //    evap = 0.0;
+//    infil=infil*0.0001;
      
-//  trans = 0.0;
-  //    trans = trans*0.0;
+ // trans = 0.0;
+ //   trans = trans*0.001;
         
   //      cout<<trans<<endl;
 
