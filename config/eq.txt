@@ -1,0 +1,13 @@
+Test_Siter/output/
+Test_Siter/regiondata/
+Test_Siter/griddata/
+Test_Siter/cohort/eq/
+Test_Siter/cohort/sp/
+Test_Siter/cohort/tr/
+Test_Siter/output/restart-eq.nc
+config/
+eq
+lookup
+normal
+initial
+Test-TEM-GUI
