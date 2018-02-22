@@ -225,6 +225,27 @@ void BgcData::endOfMonth(const int & currmind) {
 	y_vegd.leaf += m_vegd.leaf / 12;
 	y_vegd.raq10 += m_vegd.raq10 / 12;
 
+	if (currmind==11) {
+		cout <<"-- Aboveground C --"<<"\n";
+		cout <<"GPP "<<y_a2v.gpp<<"\n";
+		cout <<"NPP "<<y_a2v.npp<<"\n";
+		cout <<"INNPP "<<y_a2v.innpp<<"\n";
+		cout <<"VEGC "<<y_vegs.c<<"\n";
+//		cout <<"DEADC "<<y_vegs.deadc<<"\n";
+		cout <<"-- Belowground C --"<<"\n";
+		cout <<"SHLWC "<<y_soid.shlwc<<"\n";
+		cout <<"DEEPC "<<y_soid.deepc<<"\n";
+		cout <<"MINEC "<<y_soid.minec<<"\n";
+		cout <<"-- N cycle --"<<"\n";
+		cout <<"VEGN - STRN "<<y_vegs.strn<<"\n";
+		cout <<"VEGN - STON "<<y_vegs.ston<<"\n";
+		cout <<"NUPTAKE "<<y_soi2v.nuptake<<"\n";
+		cout <<"AVLN "<<y_sois.avln<<"\n";
+		cout <<"ORGN "<<y_sois.orgn<<"\n";
+//		cout <<"WDEBRIS "<<y_sois.wdebris<<"\n";
+//		cout <<"WDRH "<<y_soi2a.wdrh<<"\n";
+	}
+
 }
 ;
 

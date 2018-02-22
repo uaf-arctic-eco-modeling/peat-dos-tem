@@ -194,7 +194,6 @@ void EnvData::endOfMonth(const int & currmind, const bool &assign) {
 #endif
 
 	y_soid.ch4flux += m_soid.ch4flux;
-
 	y_soid.hco2flux += m_soid.hco2flux;
 	y_soid.aco2flux += m_soid.aco2flux;
 
@@ -203,6 +202,13 @@ void EnvData::endOfMonth(const int & currmind, const bool &assign) {
 		y_soid.dfratio += m_soid.dfratio / 3.;
 
 	y_soid.co2ch4 += m_soid.co2ch4 / 12.;
+
+
+	if (currmind==11) {
+		cout <<"-- METHANE --"<<"\n";
+		cout <<"CH4 "<<y_soid.ch4flux<<"\n";
+		cout <<"CO2:CH4 "<<y_soid.co2ch4<<"\n";
+	}
 
 	y_soid.oxid += m_soid.oxid;
 	y_soid.tmineral10cm += m_soid.tmineral10cm / 12.;

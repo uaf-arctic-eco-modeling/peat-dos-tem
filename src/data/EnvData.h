@@ -14,6 +14,8 @@
 #include "CohortData.h"
 
 #include <deque>
+#include <iostream>
+
 using namespace std;
 
 class EnvData{
