@@ -1,3 +1,5 @@
 .DS_Store
 DOSTEM
 Debug
+*.o
+peat-dos-tem
