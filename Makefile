@@ -155,7 +155,7 @@ TEMOBJ=	TEM.o
 	
 
 dos-tem: $(SOURCES) $(TEMOBJ)
-	$(CC) -o peat-dos-tem $(OBJECTS) $(TEMOBJ) $(LIBDIR) $(LIBS)
+	$(CC) -o peatdostem $(OBJECTS) $(TEMOBJ) $(LIBDIR) $(LIBS)
 
 lib: $(SOURCES) 
 	$(CC) -o libDOSTEM.so -shared $(INCLUDES) $(OBJECTS) $(LIBDIR) $(LIBS)
@@ -164,5 +164,5 @@ lib: $(SOURCES)
 	$(CC) $(CFLAGS) $(INCLUDES) $<
 
 clean:
-	rm -f $(OBJECTS) DVMDOSTEM TEM.o libDOSTEM.so* *~
+	rm -f $(OBJECTS) peatdostem TEM.o libDOSTEM.so* *~
 
